@@ -1,0 +1,937 @@
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --teal: #028090; --teal-dark: #01606E; --teal-deep: #014F5C;
+    --berry: #6D2E46; --berry-light: #8B3A58;
+    --cream: #F5F0E8; --cream-dark: #EDE8DF;
+    --dusty: #A26769; --charcoal: #2C2C2C;
+    --white: #ffffff; --off-white: #F9F6F1;
+  }
+  body { font-family: system-ui, -apple-system, sans-serif; background: var(--cream); color: var(--charcoal); }
+
+  /* NAV */
+  nav { background: var(--teal); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
+  .nav-logo { color: white; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dusty); }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-link { color: rgba(255,255,255,0.75); background: none; border: none; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .nav-link:hover, .nav-link.active { color: white; background: rgba(255,255,255,0.15); }
+  .nav-cta { background: var(--berry); color: white; border: none; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .nav-cta:hover { background: var(--berry-light); }
+
+  /* PAGES */
+  .page { display: none; min-height: calc(100vh - 60px); }
+  .page.active { display: block; }
+
+  /* ── LANDING PAGE ── */
+  .hero { background: linear-gradient(135deg, var(--teal-deep) 0%, var(--teal) 60%, #039aab 100%); padding: 5rem 2rem 4rem; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 20% 50%, rgba(109,46,70,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(162,103,105,0.2) 0%, transparent 40%); }
+  .hero-badge { display: inline-block; background: rgba(109,46,70,0.8); color: #f5d0db; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 1.5rem; letter-spacing: 0.5px; position: relative; }
+  .hero h1 { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; color: white; line-height: 1.1; margin-bottom: 1rem; position: relative; }
+  .hero h1 span { color: var(--dusty); }
+  .hero-sub { font-size: 1.1rem; color: rgba(255,255,255,0.8); max-width: 540px; margin: 0 auto 2.5rem; line-height: 1.6; position: relative; }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
+  .btn-primary { background: var(--berry); color: white; border: none; padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary:hover { background: var(--berry-light); transform: translateY(-1px); }
+  .btn-outline { background: transparent; color: white; border: 1.5px solid rgba(255,255,255,0.5); padding: 14px 28px; border-radius: 30px; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.1); }
+
+  .stats-bar { background: white; padding: 1.5rem 2rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background-color: var(--cream-dark); border-bottom: 1px solid var(--cream-dark); }
+  .stat-item { background: white; text-align: center; padding: 1.25rem 1rem; }
+  .stat-num { font-size: 2rem; font-weight: 800; color: var(--teal); line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--dusty); margin-top: 4px; line-height: 1.4; }
+
+  .section { padding: 4rem 2rem; max-width: 1000px; margin: 0 auto; }
+  .section-tag { display: inline-block; background: var(--teal); color: white; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 12px; margin-bottom: 0.75rem; letter-spacing: 0.5px; text-transform: uppercase; }
+  .section-title { font-size: clamp(1.6rem, 3.5vw, 2.2rem); font-weight: 800; color: var(--charcoal); margin-bottom: 0.5rem; line-height: 1.2; }
+  .section-sub { font-size: 1rem; color: #666; line-height: 1.6; margin-bottom: 2.5rem; max-width: 560px; }
+  
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
+  .feature-card { background: white; border-radius: 16px; padding: 1.5rem; border: 1px solid rgba(2,128,144,0.1); transition: all 0.25s; }
+  .feature-card:hover { transform: translateY(-3px); border-color: var(--teal); box-shadow: 0 8px 24px rgba(2,128,144,0.12); }
+  .feature-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 0.75rem; }
+  .icon-teal { background: rgba(2,128,144,0.1); }
+  .icon-berry { background: rgba(109,46,70,0.1); }
+  .feature-card h3 { font-size: 15px; font-weight: 700; color: var(--charcoal); margin-bottom: 6px; }
+  .feature-card p { font-size: 13px; color: #666; line-height: 1.5; }
+
+  .women-section { background: linear-gradient(135deg, var(--berry) 0%, #8B3A58 100%); border-radius: 20px; padding: 2.5rem; color: white; margin: 0 2rem 3rem; }
+  .women-section .tag { background: rgba(255,255,255,0.2); color: white; display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; margin-bottom: 1rem; letter-spacing: 0.5px; }
+  .women-section h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 0.75rem; }
+  .women-section p { color: rgba(255,255,255,0.85); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; }
+  .women-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+  .women-feat { background: rgba(255,255,255,0.12); border-radius: 12px; padding: 1rem; border: 1px solid rgba(255,255,255,0.15); }
+  .women-feat h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+  .women-feat p { font-size: 12px; color: rgba(255,255,255,0.75); margin: 0; }
+
+  /* ── DASHBOARD / APP ── */
+  .app-shell { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 60px); background: var(--off-white); }
+  .sidebar { background: var(--teal-deep); padding: 1.5rem 0; display: flex; flex-direction: column; }
+  .sidebar-logo { padding: 0 1.25rem 1.5rem; color: white; font-size: 16px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; }
+  .sidebar-user { padding: 0 1.25rem; margin-bottom: 1.5rem; }
+  .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--berry); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 15px; margin-bottom: 6px; }
+  .user-name { font-size: 13px; color: white; font-weight: 600; }
+  .user-role { font-size: 11px; color: rgba(255,255,255,0.55); }
+  .sidebar-nav { flex: 1; padding: 0 0.75rem; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer; transition: all 0.2s; margin-bottom: 2px; border: none; background: none; width: 100%; text-align: left; }
+  .sidebar-item:hover { background: rgba(255,255,255,0.1); color: white; }
+  .sidebar-item.active { background: rgba(255,255,255,0.15); color: white; font-weight: 600; }
+  .sidebar-item .si { font-size: 16px; width: 20px; text-align: center; }
+
+  .main-content { padding: 1.75rem; overflow-y: auto; }
+  .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .dash-title { font-size: 1.25rem; font-weight: 800; color: var(--charcoal); }
+  .dash-date { font-size: 12px; color: #888; }
+  .check-in-banner { background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%); border-radius: 16px; padding: 1.25rem 1.5rem; color: white; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+  .checkin-text h3 { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+  .checkin-text p { font-size: 12px; color: rgba(255,255,255,0.8); }
+  .checkin-btn { background: white; color: var(--teal); border: none; padding: 9px 18px; border-radius: 20px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+  .checkin-btn:hover { background: var(--cream); }
+
+  .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+  .metric-card { background: white; border-radius: 14px; padding: 1.1rem; border: 1px solid rgba(0,0,0,0.06); }
+  .metric-label { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+  .metric-val { font-size: 1.8rem; font-weight: 800; line-height: 1; }
+  .metric-sub { font-size: 11px; margin-top: 4px; }
+  .val-good { color: var(--teal); }
+  .val-warn { color: #d97706; }
+  .val-bad { color: var(--berry); }
+  .sub-up { color: #10b981; }
+  .sub-down { color: var(--berry); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .card { background: white; border-radius: 14px; padding: 1.25rem; border: 1px solid rgba(0,0,0,0.06); }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--charcoal); margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
+
+  /* Mood chart */
+  .mood-bars { display: flex; align-items: flex-end; gap: 5px; height: 80px; padding: 0 4px; }
+  .mood-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .mood-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.4s ease; min-width: 8px; }
+  .mood-day { font-size: 9px; color: #bbb; }
+
+  /* Streak tracker */
+  .streak-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 0.5rem; }
+  .streak-dot { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; }
+  .dot-done { background: var(--teal); color: white; }
+  .dot-today { background: var(--berry); color: white; }
+  .dot-miss { background: #f0f0f0; color: #bbb; }
+  .streak-label { font-size: 12px; color: #888; }
+
+  /* Peer messages */
+  .message { display: flex; gap: 8px; margin-bottom: 0.75rem; }
+  .msg-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: white; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .msg-bubble { background: var(--off-white); border-radius: 0 12px 12px 12px; padding: 8px 10px; max-width: 85%; }
+  .msg-name { font-size: 10px; font-weight: 700; color: var(--teal); margin-bottom: 3px; }
+  .msg-text { font-size: 12px; color: var(--charcoal); line-height: 1.4; }
+  .msg-time { font-size: 10px; color: #bbb; margin-top: 3px; }
+  .msg-own .msg-bubble { background: rgba(2,128,144,0.1); border-radius: 12px 0 12px 12px; }
+
+  /* Check-in modal */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  .modal { background: white; border-radius: 20px; padding: 2rem; width: 100%; max-width: 420px; }
+  .modal-header { text-align: center; margin-bottom: 1.5rem; }
+  .modal-icon { width: 52px; height: 52px; border-radius: 50%; background: rgba(2,128,144,0.1); display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 0.75rem; }
+  .modal h2 { font-size: 1.2rem; font-weight: 800; color: var(--charcoal); }
+  .modal p { font-size: 13px; color: #888; margin-top: 4px; }
+  .q-block { margin-bottom: 1.25rem; }
+  .q-label { font-size: 13px; font-weight: 600; color: var(--charcoal); margin-bottom: 8px; display: block; }
+  .q-options { display: flex; gap: 6px; }
+  .q-opt { flex: 1; padding: 8px 4px; border: 1.5px solid #e0e0e0; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; background: none; color: #666; transition: all 0.2s; text-align: center; }
+  .q-opt.sel { border-color: var(--teal); background: rgba(2,128,144,0.08); color: var(--teal); }
+  .q-opt:hover { border-color: var(--teal); }
+  .range-wrap { display: flex; align-items: center; gap: 8px; }
+  .range-wrap input { flex: 1; }
+  .range-val { font-size: 15px; font-weight: 800; color: var(--teal); min-width: 24px; }
+  .modal-foot { margin-top: 1.5rem; display: flex; gap: 8px; }
+  .modal-submit { flex: 1; background: var(--teal); color: white; border: none; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+  .modal-submit:hover { background: var(--teal-dark); }
+  .modal-skip { background: none; border: 1px solid #e0e0e0; color: #888; padding: 12px 16px; border-radius: 12px; font-size: 13px; cursor: pointer; }
+  .anon-note { font-size: 11px; color: #aaa; text-align: center; margin-top: 0.75rem; }
+
+  /* MoodMirror */
+  .mood-mirror { background: white; border-radius: 14px; padding: 1.25rem; border: 1px solid rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+  .mm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .mm-badge { background: rgba(109,46,70,0.1); color: var(--berry); font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 8px; }
+  .heatmap { display: grid; grid-template-columns: repeat(13, 1fr); gap: 3px; margin-bottom: 0.5rem; }
+  .hm-cell { aspect-ratio: 1; border-radius: 3px; cursor: pointer; transition: transform 0.1s; }
+  .hm-cell:hover { transform: scale(1.3); }
+  .hm-day-labels { display: grid; grid-template-columns: repeat(13, 1fr); gap: 3px; margin-bottom: 0.75rem; }
+  .hm-label { font-size: 8px; color: #ccc; text-align: center; }
+  .mm-legend { display: flex; align-items: center; gap: 4px; margin-bottom: 0.5rem; }
+  .mm-legend span { font-size: 10px; color: #aaa; }
+
+  /* Women's Hub */
+  .women-hub { }
+  .cycle-card { background: linear-gradient(135deg, #FDF0F3 0%, #FAE8EC 100%); border: 1px solid rgba(109,46,70,0.15); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.5rem; }
+  .cycle-header { display: flex; align-items: center; gap: 8px; margin-bottom: 0.75rem; }
+  .cycle-header h3 { font-size: 14px; font-weight: 700; color: var(--berry); }
+  .cycle-opt-badge { background: rgba(109,46,70,0.1); color: var(--berry); font-size: 10px; padding: 2px 8px; border-radius: 8px; }
+  .cycle-phases { display: flex; gap: 2px; margin-bottom: 0.75rem; height: 28px; border-radius: 8px; overflow: hidden; }
+  .phase { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: white; cursor: pointer; transition: opacity 0.2s; }
+  .phase:hover { opacity: 0.85; }
+  .ph-m { background: #e57373; }
+  .ph-f { background: #f06292; }
+  .ph-o { background: #4db6ac; }
+  .ph-l { background: #7e57c2; }
+  .phase.active-ph { outline: 2px solid var(--charcoal); outline-offset: -2px; }
+  .cycle-insight { font-size: 12px; color: #666; line-height: 1.5; padding: 8px 10px; background: white; border-radius: 8px; }
+
+  .resource-list { display: flex; flex-direction: column; gap: 8px; margin-top: 0.75rem; }
+  .resource-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: white; border-radius: 10px; border: 1px solid rgba(109,46,70,0.08); cursor: pointer; transition: all 0.2s; }
+  .resource-item:hover { border-color: var(--berry); background: #FDF8F9; }
+  .res-icon { font-size: 18px; }
+  .res-text { flex: 1; }
+  .res-title { font-size: 13px; font-weight: 600; color: var(--charcoal); }
+  .res-sub { font-size: 11px; color: #888; }
+
+  /* Peer support page */
+  .peer-layout { display: grid; grid-template-columns: 260px 1fr; gap: 1rem; height: calc(100vh - 120px); }
+  .peer-list { overflow-y: auto; }
+  .peer-item { padding: 0.85rem; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.15s; margin-bottom: 2px; }
+  .peer-item:hover { background: rgba(0,0,0,0.04); }
+  .peer-item.active-peer { background: rgba(2,128,144,0.08); }
+  .peer-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; flex-shrink: 0; }
+  .peer-info { flex: 1; min-width: 0; }
+  .peer-name { font-size: 13px; font-weight: 600; color: var(--charcoal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .peer-msg { font-size: 11px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .peer-badge { width: 18px; height: 18px; border-radius: 50%; background: var(--teal); color: white; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .anon-pill { background: rgba(2,128,144,0.1); color: var(--teal); font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
+
+  .chat-window { background: white; border-radius: 14px; border: 1px solid rgba(0,0,0,0.06); display: flex; flex-direction: column; overflow: hidden; }
+  .chat-header { padding: 1rem 1.25rem; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px; }
+  .online-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; flex-shrink: 0; }
+  .chat-messages { flex: 1; padding: 1rem; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; max-height: 340px; }
+  .chat-msg { max-width: 75%; }
+  .chat-msg.received { align-self: flex-start; }
+  .chat-msg.sent { align-self: flex-end; }
+  .chat-bubble { padding: 9px 13px; border-radius: 16px; font-size: 13px; line-height: 1.4; }
+  .received .chat-bubble { background: #f5f5f5; color: var(--charcoal); border-radius: 4px 16px 16px 16px; }
+  .sent .chat-bubble { background: var(--teal); color: white; border-radius: 16px 4px 16px 16px; }
+  .chat-time { font-size: 10px; color: #bbb; margin-top: 3px; }
+  .sent .chat-time { text-align: right; }
+  .chat-input-row { padding: 0.75rem 1rem; border-top: 1px solid #f0f0f0; display: flex; gap: 8px; align-items: center; }
+  .chat-input { flex: 1; border: 1px solid #e0e0e0; border-radius: 20px; padding: 8px 14px; font-size: 13px; outline: none; }
+  .chat-input:focus { border-color: var(--teal); }
+  .chat-send { background: var(--teal); color: white; border: none; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: background 0.2s; flex-shrink: 0; }
+  .chat-send:hover { background: var(--teal-dark); }
+
+  /* AI insights */
+  .insight-card { border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem; display: flex; gap: 10px; }
+  .insight-card.warn { background: #FFF8F0; border: 1px solid rgba(217,119,6,0.2); }
+  .insight-card.good { background: #F0FAF6; border: 1px solid rgba(16,185,129,0.2); }
+  .insight-card.info { background: #F0F9FF; border: 1px solid rgba(2,128,144,0.2); }
+  .insight-icon { font-size: 20px; flex-shrink: 0; }
+  .insight-title { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .warn .insight-title { color: #d97706; }
+  .good .insight-title { color: #059669; }
+  .info .insight-title { color: var(--teal); }
+  .insight-body { font-size: 11px; color: #666; line-height: 1.4; }
+
+  /* Resources */
+  .resources-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .res-card { background: white; border-radius: 14px; padding: 1.25rem; border: 1px solid rgba(0,0,0,0.06); cursor: pointer; transition: all 0.2s; }
+  .res-card:hover { transform: translateY(-2px); border-color: var(--teal); box-shadow: 0 4px 16px rgba(2,128,144,0.1); }
+  .res-type { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem; }
+  .res-card h4 { font-size: 14px; font-weight: 700; color: var(--charcoal); margin-bottom: 6px; line-height: 1.3; }
+  .res-card p { font-size: 12px; color: #888; line-height: 1.4; }
+  .res-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 0.75rem; }
+
+  /* Progress badge */
+  .streak-badge { background: var(--teal); color: white; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 10px; display: inline-flex; align-items: center; gap: 4px; }
+
+  .hidden { display: none !important; }
+</style>
+
+<div id="app">
+  <nav>
+    <div class="nav-logo"><div class="logo-dot"></div>Karmic AI</div>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showPage('landing')">Home</button>
+      <button class="nav-link" onclick="showPage('dashboard')">Dashboard</button>
+      <button class="nav-link" onclick="showPage('peer')">Peer Support</button>
+      <button class="nav-link" onclick="showPage('women')">She Space</button>
+      <button class="nav-link" onclick="showPage('resources')">Resources</button>
+    </div>
+    <button class="nav-cta" onclick="showPage('dashboard')">Open App →</button>
+  </nav>
+
+  <!-- ══════════ LANDING PAGE ══════════ -->
+  <div id="landing" class="page active">
+    <div class="hero">
+      <div class="hero-badge">✦ Built for her, by those who see her</div>
+      <h1>Mental health for<br><span>India's healers</span></h1>
+      <p class="hero-sub">The first anonymous, AI-powered burnout prevention platform built specifically for Indian doctors and medical students.</p>
+      <div class="hero-btns">
+        <button class="btn-primary" onclick="showPage('dashboard')">Try the App Demo →</button>
+        <button class="btn-outline" onclick="showCheckin()">Take 90-sec Check-In</button>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-num">1 in 3</div>
+        <div class="stat-label">resident doctors show signs of severe depression</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">76%</div>
+        <div class="stat-label">of medical students report burnout in India</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2×</div>
+        <div class="stat-label">women doctors experience burnout vs male peers</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <span class="section-tag">What we do</span>
+      <h2 class="section-title">Your wellbeing, finally in safe hands</h2>
+      <p class="section-sub">Karmic AI works quietly in the background of your life — catching warning signs before they become crises.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon icon-teal">🫀</div>
+          <h3>Daily Check-In</h3>
+          <p>90-second anonymous burnout + depression screening using validated PHQ-9 and Maslach scales. Gamified streaks keep you consistent.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon icon-teal">🧠</div>
+          <h3>AI Early Warning</h3>
+          <p>Detects burnout trajectories 2–3 weeks before a crisis peaks. Your hospital sees aggregate-only data. Your name stays invisible.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon icon-berry">👥</div>
+          <h3>Peer Support</h3>
+          <p>Doctor-to-doctor anonymous text support. No therapist hierarchy. Just people who understand your 80-hour weeks. Available 24/7.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon icon-teal">🔒</div>
+          <h3>Zero-Knowledge Privacy</h3>
+          <p>Differential privacy applied before any data leaves your device. Your name is mathematically invisible — not just promised, guaranteed.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon icon-berry">🪞</div>
+          <h3>MoodMirror™</h3>
+          <p>90-day personal emotional weather map. Finds YOUR specific burnout triggers — shift load, sleep, call frequency — not generic patterns.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon icon-teal">📅</div>
+          <h3>Care Network</h3>
+          <p>Book subsidized, discreet sessions with verified psychiatrists in under 15 minutes. Covered by your hospital's wellness plan.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="women-section">
+      <div class="tag">✦ SHE SPACE — WOMEN-FIRST DESIGN</div>
+      <h2>Built for the women who hold up medicine</h2>
+      <p>4.2 lakh registered women doctors in India face burnout, harassment, maternity stigma, and pay gaps — with zero dedicated mental health infrastructure. Karmic AI is the first platform designed with their specific reality in mind.</p>
+      <div class="women-features">
+        <div class="women-feat">
+          <h4>Cycle-aware tracking</h4>
+          <p>Opt-in menstrual cycle layer that correlates hormonal shifts with mood data — giving a complete picture no other burnout tool offers.</p>
+        </div>
+        <div class="women-feat">
+          <h4>Harassment reporting</h4>
+          <p>Anonymous, timestamped incident logging with guided escalation — so evidence is never lost and you're never alone.</p>
+        </div>
+        <div class="women-feat">
+          <h4>Maternity support</h4>
+          <p>Dedicated onboarding track for residents navigating maternity leave, return-to-work anxiety, and institutional pressure.</p>
+        </div>
+        <div class="women-feat">
+          <h4>Women-only peer rooms</h4>
+          <p>Safe, moderated spaces where only women doctors connect. No hierarchy. No judgment. Just understanding.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center; padding: 3rem 2rem 4rem; background: var(--teal-deep);">
+      <p style="font-size:1.4rem; color:rgba(255,255,255,0.75); max-width:580px; margin: 0 auto 0.75rem; line-height:1.6; font-style:italic;">"She studied for 7 years to save your life. Who is saving hers?"</p>
+      <button class="btn-primary" style="margin-top:1.25rem" onclick="showPage('dashboard')">Start your journey →</button>
+    </div>
+  </div>
+
+  <!-- ══════════ DASHBOARD ══════════ -->
+  <div id="dashboard" class="page">
+    <div class="app-shell">
+      <div class="sidebar">
+        <div class="sidebar-logo">Karmic AI</div>
+        <div class="sidebar-user">
+          <div class="user-avatar">PR</div>
+          <div class="user-name">Dr. Priya R.</div>
+          <div class="user-role">Cardiology Resident · AIIMS</div>
+        </div>
+        <div class="sidebar-nav">
+          <button class="sidebar-item active" onclick="setDashTab(this,'overview')"><span class="si">📊</span> Overview</button>
+          <button class="sidebar-item" onclick="setDashTab(this,'moodmirror')"><span class="si">🪞</span> MoodMirror™</button>
+          <button class="sidebar-item" onclick="showPage('peer')"><span class="si">💬</span> Peer Support</button>
+          <button class="sidebar-item" onclick="showPage('women')"><span class="si">🌸</span> She Space</button>
+          <button class="sidebar-item" onclick="showPage('resources')"><span class="si">📚</span> Resources</button>
+        </div>
+      </div>
+
+      <div class="main-content" id="dash-main">
+        <div id="dash-overview">
+          <div class="dash-header">
+            <div>
+              <div class="dash-title">Good morning, Priya 👋</div>
+              <div class="dash-date">Thursday, 17 April · Week 3 of residency block</div>
+            </div>
+            <div class="streak-badge">🔥 14 day streak</div>
+          </div>
+
+          <div class="check-in-banner">
+            <div class="checkin-text">
+              <h3>Today's check-in is waiting</h3>
+              <p>90 seconds · Fully anonymous · Helps the AI see your patterns</p>
+            </div>
+            <button class="checkin-btn" onclick="showCheckin()">Check In Now</button>
+          </div>
+
+          <div class="metrics-row">
+            <div class="metric-card">
+              <div class="metric-label">Burnout Score</div>
+              <div class="metric-val val-warn">6.2<span style="font-size:1rem;color:#aaa">/10</span></div>
+              <div class="metric-sub sub-down">↑ +0.4 from last week</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Sleep Avg</div>
+              <div class="metric-val val-bad">4.8<span style="font-size:1rem;color:#aaa">hrs</span></div>
+              <div class="metric-sub sub-down">↓ Below your baseline</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Resilience Index</div>
+              <div class="metric-val val-good">68<span style="font-size:1rem;color:#aaa">%</span></div>
+              <div class="metric-sub sub-up">↑ +3% this week</div>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <div class="card-title">🌡️ 14-Day Mood Trend</div>
+              <div class="mood-bars" id="mood-chart"></div>
+              <div style="display:flex;gap:5px;margin-top:6px;padding:0 4px;" id="mood-labels"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">✅ Check-in Streak</div>
+              <div class="streak-row" id="streak-row"></div>
+              <div class="streak-label">14 of last 21 days — Keep going!</div>
+              <div style="margin-top:0.75rem;">
+                <div class="insight-card info">
+                  <div class="insight-icon">🤖</div>
+                  <div><div class="insight-title">AI notice</div><div class="insight-body">Your scores dip on post-call days. The AI is tracking this pattern.</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:1rem">
+            <div class="card-title">🔔 AI Insights for You</div>
+            <div class="insight-card warn">
+              <div class="insight-icon">⚠️</div>
+              <div><div class="insight-title">Moderate trajectory detected</div><div class="insight-body">Your burnout score has risen 3 points over 18 days. This pattern often precedes a crisis — consider booking a peer session this week.</div></div>
+            </div>
+            <div class="insight-card good">
+              <div class="insight-icon">✨</div>
+              <div><div class="insight-title">Resilience is holding</div><div class="insight-body">Despite the score rise, your self-reported coping has stayed steady. That matters — keep the streak going.</div></div>
+            </div>
+            <div class="insight-card info">
+              <div class="insight-icon">💬</div>
+              <div><div class="insight-title">Peer counselor available</div><div class="insight-body">Dr. Ananya (Cardiology, 4th year) sent you an anonymous check-in. <a href="#" onclick="showPage('peer');return false;" style="color:var(--teal);font-weight:600;">Reply →</a></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="dash-moodmirror" class="hidden">
+          <div class="dash-header">
+            <div>
+              <div class="dash-title">MoodMirror™</div>
+              <div class="dash-date">Your personal emotional weather map · Last 91 days</div>
+            </div>
+            <div class="mm-badge">OPT-IN ACTIVE</div>
+          </div>
+          <div class="mood-mirror">
+            <div class="mm-header">
+              <span style="font-size:13px;font-weight:700;color:var(--charcoal)">91-day heatmap</span>
+              <span style="font-size:11px;color:#aaa">Tap a cell to see context</span>
+            </div>
+            <div class="heatmap" id="heatmap"></div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+              <span style="font-size:10px;color:#aaa">Low</span>
+              <div style="display:flex;gap:3px">
+                <div style="width:12px;height:12px;border-radius:2px;background:#fde8ec"></div>
+                <div style="width:12px;height:12px;border-radius:2px;background:#f9afc0"></div>
+                <div style="width:12px;height:12px;border-radius:2px;background:#e57080"></div>
+                <div style="width:12px;height:12px;border-radius:2px;background:#028090"></div>
+                <div style="width:12px;height:12px;border-radius:2px;background:#014F5C"></div>
+              </div>
+              <span style="font-size:10px;color:#aaa">High</span>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="card">
+              <div class="card-title">🎯 Your Top Burnout Triggers</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:0.25rem">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:13px;color:var(--charcoal)">Post-call days</span>
+                  <div style="display:flex;align-items:center;gap:6px"><div style="height:6px;border-radius:3px;background:var(--berry);width:90px"></div><span style="font-size:11px;color:var(--berry);font-weight:700">High</span></div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:13px;color:var(--charcoal)">Sleep &lt; 5 hrs</span>
+                  <div style="display:flex;align-items:center;gap:6px"><div style="height:6px;border-radius:3px;background:#d97706;width:72px"></div><span style="font-size:11px;color:#d97706;font-weight:700">Mod</span></div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:13px;color:var(--charcoal)">6+ consecutive shifts</span>
+                  <div style="display:flex;align-items:center;gap:6px"><div style="height:6px;border-radius:3px;background:#d97706;width:60px"></div><span style="font-size:11px;color:#d97706;font-weight:700">Mod</span></div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <span style="font-size:13px;color:var(--charcoal)">Skipped meals</span>
+                  <div style="display:flex;align-items:center;gap:6px"><div style="height:6px;border-radius:3px;background:#10b981;width:36px"></div><span style="font-size:11px;color:#10b981;font-weight:700">Low</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">💡 Personal Micro-Interventions</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="padding:8px 10px;background:#f0f9fa;border-radius:10px;border-left:3px solid var(--teal)">
+                  <div style="font-size:12px;font-weight:700;color:var(--teal)">Post-call ritual</div>
+                  <div style="font-size:11px;color:#555;margin-top:2px">Take the long route home. 4-minute walk, no phone.</div>
+                </div>
+                <div style="padding:8px 10px;background:#f0f9fa;border-radius:10px;border-left:3px solid var(--teal)">
+                  <div style="font-size:12px;font-weight:700;color:var(--teal)">Sleep dip alert</div>
+                  <div style="font-size:11px;color:#555;margin-top:2px">Try a 6-min box breathing session tonight. Proven for shift workers.</div>
+                </div>
+                <div style="padding:8px 10px;background:#fdf0f3;border-radius:10px;border-left:3px solid var(--berry)">
+                  <div style="font-size:12px;font-weight:700;color:var(--berry)">Cycle note (day 21)</div>
+                  <div style="font-size:11px;color:#555;margin-top:2px">Luteal phase begins. Scores historically dip — factor this in this week.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PEER SUPPORT ══════════ -->
+  <div id="peer" class="page">
+    <div class="app-shell">
+      <div class="sidebar">
+        <div class="sidebar-logo">Karmic AI</div>
+        <div class="sidebar-user">
+          <div class="user-avatar">PR</div>
+          <div class="user-name">Dr. Priya R.</div>
+          <div class="user-role">Cardiology · AIIMS</div>
+        </div>
+        <div class="sidebar-nav">
+          <button class="sidebar-item" onclick="showPage('dashboard')"><span class="si">📊</span> Overview</button>
+          <button class="sidebar-item active"><span class="si">💬</span> Peer Support</button>
+          <button class="sidebar-item" onclick="showPage('women')"><span class="si">🌸</span> She Space</button>
+          <button class="sidebar-item" onclick="showPage('resources')"><span class="si">📚</span> Resources</button>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="dash-header">
+          <div>
+            <div class="dash-title">Peer Support</div>
+            <div class="dash-date">All conversations are fully anonymous · Doctor-to-doctor only</div>
+          </div>
+          <span class="anon-pill">🔒 Anonymous</span>
+        </div>
+        <div class="peer-layout">
+          <div class="peer-list">
+            <div style="font-size:11px;color:#aaa;font-weight:700;padding:4px 8px;margin-bottom:4px;letter-spacing:0.5px">CONVERSATIONS</div>
+            <div class="peer-item active-peer" onclick="selectPeer(this,'ananya')">
+              <div class="peer-av" style="background:var(--teal)">AN</div>
+              <div class="peer-info"><div class="peer-name">Dr. Ananya (Peer)</div><div class="peer-msg">Hey. You doing okay?</div></div>
+              <div class="peer-badge">1</div>
+            </div>
+            <div class="peer-item" onclick="selectPeer(this,'support')">
+              <div class="peer-av" style="background:var(--berry)">KA</div>
+              <div class="peer-info"><div class="peer-name">Karmic AI Support</div><div class="peer-msg">Your weekly check is ready</div></div>
+            </div>
+            <div class="peer-item" onclick="selectPeer(this,'group')">
+              <div class="peer-av" style="background:#7e57c2">GR</div>
+              <div class="peer-info"><div class="peer-name">Women in Cards group</div><div class="peer-msg">Meera: Anyone else had a...</div></div>
+              <div class="peer-badge">3</div>
+            </div>
+            <div style="font-size:11px;color:#aaa;font-weight:700;padding:12px 8px 4px;letter-spacing:0.5px">FIND A PEER</div>
+            <div style="padding:4px 8px">
+              <input style="width:100%;border:1px solid #e0e0e0;border-radius:8px;padding:7px 10px;font-size:12px;outline:none" placeholder="Search specialty, year..." />
+              <div style="margin-top:6px;display:flex;flex-direction:column;gap:4px" id="peer-suggestions">
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;border-radius:8px" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">
+                  <div style="width:28px;height:28px;border-radius:50%;background:#5db6a0;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">RM</div>
+                  <div><div style="font-size:12px;font-weight:600">Peer · Neurology, Yr 4</div><div style="font-size:10px;color:#aaa">Available now</div></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 4px;cursor:pointer;border-radius:8px" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background='none'">
+                  <div style="width:28px;height:28px;border-radius:50%;background:#f06292;color:white;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">SV</div>
+                  <div><div style="font-size:12px;font-weight:600">Peer · Psychiatry, Yr 2</div><div style="font-size:10px;color:#aaa">Active 2h ago</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="chat-window" id="chat-window">
+            <div class="chat-header">
+              <div class="peer-av" style="background:var(--teal);width:34px;height:34px;font-size:11px">AN</div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:700">Dr. Ananya</div><div style="font-size:11px;color:#888">Senior Resident · Cardiology · Peer Counselor</div></div>
+              <div class="online-dot"></div>
+              <span style="font-size:10px;color:#aaa;margin-left:3px">Online</span>
+            </div>
+            <div class="chat-messages" id="chat-msgs">
+              <div class="chat-msg received"><div class="chat-bubble">Hey. Just wanted to check in. How are you doing this week?</div><div class="chat-time">10:32 AM</div></div>
+              <div class="chat-msg sent"><div class="chat-bubble">Honestly? Exhausted. Had 3 post-call days back to back. Scores on the app have been rough.</div><div class="chat-time">10:45 AM</div></div>
+              <div class="chat-msg received"><div class="chat-bubble">I know that feeling. The app flagged something similar for me in my second year. You're not alone in this.</div><div class="chat-time">10:46 AM</div></div>
+              <div class="chat-msg received"><div class="chat-bubble">Have you tried booking a session with one of the partner psychiatrists? Karmic AI covers up to 3 sessions this month.</div><div class="chat-time">10:47 AM</div></div>
+            </div>
+            <div class="chat-input-row">
+              <input class="chat-input" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendChat()" />
+              <button class="chat-send" onclick="sendChat()">→</button>
+            </div>
+            <div style="padding:4px 1rem 8px;font-size:10px;color:#bbb;text-align:center">🔒 End-to-end anonymous · No names stored</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SHE SPACE ══════════ -->
+  <div id="women" class="page">
+    <div class="app-shell">
+      <div class="sidebar">
+        <div class="sidebar-logo">Karmic AI</div>
+        <div class="sidebar-user">
+          <div class="user-avatar" style="background:var(--berry)">PR</div>
+          <div class="user-name">Dr. Priya R.</div>
+          <div class="user-role">She Space member</div>
+        </div>
+        <div class="sidebar-nav">
+          <button class="sidebar-item" onclick="showPage('dashboard')"><span class="si">📊</span> Overview</button>
+          <button class="sidebar-item" onclick="showPage('peer')"><span class="si">💬</span> Peer Support</button>
+          <button class="sidebar-item active"><span class="si">🌸</span> She Space</button>
+          <button class="sidebar-item" onclick="showPage('resources')"><span class="si">📚</span> Resources</button>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="dash-header">
+          <div>
+            <div class="dash-title" style="color:var(--berry)">She Space 🌸</div>
+            <div class="dash-date">A dedicated space built around the reality of being a woman in medicine</div>
+          </div>
+        </div>
+
+        <div class="cycle-card">
+          <div class="cycle-header">
+            <span style="font-size:18px">🔄</span>
+            <h3>Cycle-aware tracking</h3>
+            <span class="cycle-opt-badge">OPT-IN</span>
+          </div>
+          <div style="font-size:12px;color:#666;margin-bottom:0.75rem">Correlating your mood data with your cycle phase. Tap a phase to see your historical mood pattern.</div>
+          <div class="cycle-phases" id="cycle-phases">
+            <div class="phase ph-m" onclick="selectPhase(this,'M')">Men.</div>
+            <div class="phase ph-f" onclick="selectPhase(this,'F')">Foll.</div>
+            <div class="phase ph-o active-ph" onclick="selectPhase(this,'O')">Ovul.</div>
+            <div class="phase ph-l" onclick="selectPhase(this,'L')">Lut.</div>
+          </div>
+          <div class="cycle-insight" id="cycle-insight">
+            <strong>Ovulation phase (Day 12–16):</strong> Historically your highest energy and mood scores. Your burnout index averages 4.1 during this window — significantly below your overall mean of 6.2. Scheduling high-stakes tasks during this phase may help.
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card">
+            <div class="card-title" style="color:var(--berry)">🛡️ Incident log</div>
+            <div style="font-size:12px;color:#666;margin-bottom:0.75rem">Anonymous, timestamped records. Evidence stays safe.</div>
+            <div class="resource-list">
+              <div class="resource-item">
+                <div class="res-icon">📝</div>
+                <div class="res-text"><div class="res-title">Log a new incident</div><div class="res-sub">Harassment · Discrimination · Unsafe environment</div></div>
+                <div style="color:var(--berry);font-size:13px">→</div>
+              </div>
+              <div class="resource-item">
+                <div class="res-icon">📋</div>
+                <div class="res-text"><div class="res-title">View my log</div><div class="res-sub">2 entries — secure & encrypted</div></div>
+                <div style="color:var(--berry);font-size:13px">→</div>
+              </div>
+              <div class="resource-item">
+                <div class="res-icon">⚖️</div>
+                <div class="res-text"><div class="res-title">Know your rights</div><div class="res-sub">POSH Act · NMC guidelines</div></div>
+                <div style="color:var(--berry);font-size:13px">→</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="color:var(--berry)">🤝 Women-only peer rooms</div>
+            <div style="font-size:12px;color:#666;margin-bottom:0.75rem">Safe, moderated spaces. Verified women doctors only.</div>
+            <div class="resource-list">
+              <div class="resource-item">
+                <div class="res-icon">💬</div>
+                <div class="res-text"><div class="res-title">Women in Surgery</div><div class="res-sub">142 members · 3 online now</div></div>
+                <div style="color:var(--berry);font-size:13px">→</div>
+              </div>
+              <div class="resource-item">
+                <div class="res-icon">💬</div>
+                <div class="res-text"><div class="res-title">Maternity &amp; Return</div><div class="res-sub">67 members · Support group</div></div>
+                <div style="color:var(--berry);font-size:13px">→</div>
+              </div>
+              <div class="resource-item">
+                <div class="res-icon">💬</div>
+                <div class="res-text"><div class="res-title">Women in Cards</div><div class="res-sub">34 members · Active now</div></div>
+                <div style="color:var(--berry);font-size:13px">→</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <div class="card-title" style="color:var(--berry)">🌱 Maternity &amp; return-to-work support</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-top:0.25rem">
+            <div style="padding:0.75rem;background:#fdf0f3;border-radius:10px;border-left:3px solid var(--berry)"><div style="font-size:12px;font-weight:700;color:var(--berry);margin-bottom:4px">Before leave</div><div style="font-size:11px;color:#666">Planning your handover, rights, and what to expect from your department.</div></div>
+            <div style="padding:0.75rem;background:#fdf0f3;border-radius:10px;border-left:3px solid var(--berry)"><div style="font-size:12px;font-weight:700;color:var(--berry);margin-bottom:4px">During leave</div><div style="font-size:11px;color:#666">Stay connected with the peer community without career pressure.</div></div>
+            <div style="padding:0.75rem;background:#fdf0f3;border-radius:10px;border-left:3px solid var(--berry)"><div style="font-size:12px;font-weight:700;color:var(--berry);margin-bottom:4px">Return-to-work</div><div style="font-size:11px;color:#666">Structured 4-week reintegration check-ins and peer matching.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ RESOURCES ══════════ -->
+  <div id="resources" class="page">
+    <div class="app-shell">
+      <div class="sidebar">
+        <div class="sidebar-logo">Karmic AI</div>
+        <div class="sidebar-user">
+          <div class="user-avatar">PR</div>
+          <div class="user-name">Dr. Priya R.</div>
+          <div class="user-role">Cardiology · AIIMS</div>
+        </div>
+        <div class="sidebar-nav">
+          <button class="sidebar-item" onclick="showPage('dashboard')"><span class="si">📊</span> Overview</button>
+          <button class="sidebar-item" onclick="showPage('peer')"><span class="si">💬</span> Peer Support</button>
+          <button class="sidebar-item" onclick="showPage('women')"><span class="si">🌸</span> She Space</button>
+          <button class="sidebar-item active"><span class="si">📚</span> Resources</button>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="dash-header">
+          <div class="dash-title">Resources</div>
+          <div class="dash-date">Curated for doctors · Evidence-based</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem">
+          <button style="background:var(--teal);color:white;border:none;padding:7px 16px;border-radius:16px;font-size:12px;font-weight:600;cursor:pointer">All</button>
+          <button style="background:none;color:#666;border:1px solid #e0e0e0;padding:7px 16px;border-radius:16px;font-size:12px;cursor:pointer">Exercises</button>
+          <button style="background:none;color:#666;border:1px solid #e0e0e0;padding:7px 16px;border-radius:16px;font-size:12px;cursor:pointer">Articles</button>
+          <button style="background:none;color:#666;border:1px solid #e0e0e0;padding:7px 16px;border-radius:16px;font-size:12px;cursor:pointer">Sessions</button>
+          <button style="background:none;color:#666;border:1px solid #e0e0e0;padding:7px 16px;border-radius:16px;font-size:12px;cursor:pointer">For Women</button>
+        </div>
+        <div class="resources-grid">
+          <div class="res-card">
+            <div class="res-type" style="color:var(--teal)">🫁 EXERCISE</div>
+            <h4>4-minute box breathing</h4>
+            <p>Clinically validated for post-call recovery. Reduces cortisol by 18% in shift workers.</p>
+            <div class="res-meta"><span style="font-size:11px;color:#aaa">4 min</span><span style="font-size:11px;background:rgba(2,128,144,0.1);color:var(--teal);padding:2px 8px;border-radius:8px;font-weight:600">Start →</span></div>
+          </div>
+          <div class="res-card">
+            <div class="res-type" style="color:var(--berry)">📖 ARTICLE</div>
+            <h4>Burnout vs. depression: knowing the difference</h4>
+            <p>Written for doctors, by psychiatrists who specialise in medical culture and burnout.</p>
+            <div class="res-meta"><span style="font-size:11px;color:#aaa">6 min read</span><span style="font-size:11px;background:rgba(109,46,70,0.1);color:var(--berry);padding:2px 8px;border-radius:8px;font-weight:600">Read →</span></div>
+          </div>
+          <div class="res-card">
+            <div class="res-type" style="color:var(--teal)">👩‍⚕️ SESSION</div>
+            <h4>Book a psychiatrist session</h4>
+            <p>Verified, discreet, subsidised. Partner network across India. 15-min to book.</p>
+            <div class="res-meta"><span style="font-size:11px;color:#aaa">3 sessions free</span><span style="font-size:11px;background:rgba(2,128,144,0.1);color:var(--teal);padding:2px 8px;border-radius:8px;font-weight:600">Book →</span></div>
+          </div>
+          <div class="res-card">
+            <div class="res-type" style="color:var(--berry)">🌸 FOR WOMEN</div>
+            <h4>Navigating harassment in residency</h4>
+            <p>A practical guide — what to log, who to tell, your rights under the POSH Act.</p>
+            <div class="res-meta"><span style="font-size:11px;color:#aaa">10 min read</span><span style="font-size:11px;background:rgba(109,46,70,0.1);color:var(--berry);padding:2px 8px;border-radius:8px;font-weight:600">Read →</span></div>
+          </div>
+          <div class="res-card">
+            <div class="res-type" style="color:var(--teal)">🎧 AUDIO</div>
+            <h4>Sleep reset for shift workers</h4>
+            <p>20-minute guided session designed around the post-call circadian disruption pattern.</p>
+            <div class="res-meta"><span style="font-size:11px;color:#aaa">20 min</span><span style="font-size:11px;background:rgba(2,128,144,0.1);color:var(--teal);padding:2px 8px;border-radius:8px;font-weight:600">Listen →</span></div>
+          </div>
+          <div class="res-card">
+            <div class="res-type" style="color:var(--berry)">🌸 FOR WOMEN</div>
+            <h4>Cycle-aware scheduling guide</h4>
+            <p>How to plan your hardest work around your highest-energy phases. Evidence-based.</p>
+            <div class="res-meta"><span style="font-size:11px;color:#aaa">5 min read</span><span style="font-size:11px;background:rgba(109,46,70,0.1);color:var(--berry);padding:2px 8px;border-radius:8px;font-weight:600">Read →</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CHECK-IN MODAL ══════════ -->
+  <div id="checkin-modal" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:300;display:none;align-items:center;justify-content:center;padding:1rem">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-icon">🫀</div>
+        <h2>Daily Check-In</h2>
+        <p>Anonymous · 90 seconds · PHQ-9 validated</p>
+      </div>
+      <div class="q-block">
+        <label class="q-label">How are you feeling overall today?</label>
+        <div class="q-options">
+          <button class="q-opt" onclick="selectOpt(this)">😞 Low</button>
+          <button class="q-opt" onclick="selectOpt(this)">😐 Okay</button>
+          <button class="q-opt" onclick="selectOpt(this)">🙂 Good</button>
+          <button class="q-opt sel" onclick="selectOpt(this)">😊 Great</button>
+        </div>
+      </div>
+      <div class="q-block">
+        <label class="q-label">Hours of sleep last night: <span id="sleep-val" style="color:var(--teal);font-weight:700">5</span></label>
+        <div class="range-wrap">
+          <span style="font-size:12px;color:#aaa">0</span>
+          <input type="range" min="0" max="12" value="5" step="1" oninput="document.getElementById('sleep-val').textContent=this.value" style="flex:1" />
+          <span style="font-size:12px;color:#aaa">12h</span>
+        </div>
+      </div>
+      <div class="q-block">
+        <label class="q-label">Energy level at work today?</label>
+        <div class="q-options">
+          <button class="q-opt" onclick="selectOpt(this)">⚡ Low</button>
+          <button class="q-opt sel" onclick="selectOpt(this)">🔋 Medium</button>
+          <button class="q-opt" onclick="selectOpt(this)">💪 High</button>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-skip" onclick="hideCheckin()">Skip today</button>
+        <button class="modal-submit" onclick="submitCheckin()">Save check-in →</button>
+      </div>
+      <div class="anon-note">🔒 Your response is anonymised before it leaves this device</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const map = {landing:0,dashboard:1,peer:2,women:3,resources:4};
+  const idx = map[id];
+  if (idx !== undefined) document.querySelectorAll('.nav-link')[idx]?.classList.add('active');
+}
+
+function setDashTab(btn, tab) {
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('dash-overview').classList.toggle('hidden', tab !== 'overview');
+  document.getElementById('dash-moodmirror').classList.toggle('hidden', tab !== 'moodmirror');
+}
+
+function showCheckin() {
+  const m = document.getElementById('checkin-modal');
+  m.style.display = 'flex'; m.classList.remove('hidden');
+}
+function hideCheckin() {
+  const m = document.getElementById('checkin-modal');
+  m.style.display = 'none';
+}
+function selectOpt(btn) {
+  btn.closest('.q-options').querySelectorAll('.q-opt').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+function submitCheckin() {
+  hideCheckin();
+  const banner = document.querySelector('.check-in-banner');
+  if (banner) { banner.innerHTML = '<div class="checkin-text"><h3>✅ Check-in complete!</h3><p>Streak extended to 15 days 🔥 Great work, Priya.</p></div><div class="streak-badge" style="color:white">🔥 15 days</div>'; }
+}
+
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msgs = document.getElementById('chat-msgs');
+  if (!input.value.trim()) return;
+  const div = document.createElement('div');
+  div.className = 'chat-msg sent';
+  const now = new Date();
+  div.innerHTML = `<div class="chat-bubble">${input.value}</div><div class="chat-time">${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}</div>`;
+  msgs.appendChild(div);
+  input.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    const r = document.createElement('div');
+    r.className = 'chat-msg received';
+    r.innerHTML = `<div class="chat-bubble">I hear you. Have you tried the 4-min breathing exercise in Resources? It genuinely helped me after difficult post-call nights.</div><div class="chat-time">${now.getHours()}:${String(now.getMinutes()+1).padStart(2,'0')}</div>`;
+    msgs.appendChild(r);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1200);
+}
+
+function selectPeer(item) {
+  document.querySelectorAll('.peer-item').forEach(p => p.classList.remove('active-peer'));
+  item.classList.add('active-peer');
+  const badge = item.querySelector('.peer-badge');
+  if (badge) badge.remove();
+}
+
+function selectPhase(el, phase) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active-ph'));
+  el.classList.add('active-ph');
+  const insights = {
+    M: '<strong>Menstrual phase (Day 1–5):</strong> Your lowest average scores — burnout index peaks at 7.8 on days 1–2. The AI flags this as high-risk. Scheduling rest and avoiding high-stakes procedures on Day 1 correlates with faster recovery.',
+    F: '<strong>Follicular phase (Day 6–11):</strong> Scores improve steadily. You report higher focus and lower emotional exhaustion. A good window for complex tasks, learning, and catch-up.',
+    O: '<strong>Ovulation phase (Day 12–16):</strong> Historically your highest energy and mood scores. Your burnout index averages 4.1 — significantly below your mean of 6.2. High-stakes tasks perform better here.',
+    L: '<strong>Luteal phase (Day 17–28):</strong> Gradual score decline, especially days 24–28. AI flags this as a watch window. Peer check-ins during this phase have shown measurable mood stabilisation.'
+  };
+  document.getElementById('cycle-insight').innerHTML = insights[phase];
+}
+
+function buildMoodChart() {
+  const vals = [4,5,3,6,5,4,7,6,5,4,3,5,6,5];
+  const days = ['M','T','W','T','F','S','S','M','T','W','T','F','S','T'];
+  const colors = ['#e57373','#ef9a9a','#e57373','#028090','#3d9ea8','#e57373','#028090','#028090','#ef9a9a','#e57373','#e57373','#ef9a9a','#028090','#028090'];
+  const chart = document.getElementById('mood-chart');
+  const labels = document.getElementById('mood-labels');
+  if (!chart) return;
+  chart.innerHTML = ''; labels.innerHTML = '';
+  vals.forEach((v, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'mood-bar-wrap';
+    const bar = document.createElement('div');
+    bar.className = 'mood-bar';
+    bar.style.cssText = `height:${v*10}px;background:${colors[i]}`;
+    wrap.appendChild(bar);
+    chart.appendChild(wrap);
+    const l = document.createElement('span');
+    l.style.cssText = 'font-size:9px;color:#bbb;flex:1;text-align:center';
+    l.textContent = days[i];
+    labels.appendChild(l);
+  });
+}
+
+function buildStreak() {
+  const row = document.getElementById('streak-row');
+  if (!row) return;
+  const pattern = [1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,2];
+  pattern.forEach((v,i) => {
+    const d = document.createElement('div');
+    d.className = 'streak-dot ' + (v===2?'dot-today':v===1?'dot-done':'dot-miss');
+    d.textContent = v===2?'●':v===1?'✓':'·';
+    row.appendChild(d);
+  });
+}
+
+function buildHeatmap() {
+  const hm = document.getElementById('heatmap');
+  if (!hm) return;
+  const cols = ['#fde8ec','#f9afc0','#e57080','#3d9ea8','#028090','#014F5C','#fde8ec','#ef9a9a','#e57080','#028090','#3d9ea8','#028090','#fde8ec'];
+  for (let i = 0; i < 91; i++) {
+    const v = Math.floor(Math.random()*5);
+    const stops = ['#fde8ec','#f9afc0','#e57080','#028090','#014F5C'];
+    const cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    cell.style.background = stops[v];
+    cell.title = `Day ${i+1}: Score ${v+4}/10`;
+    hm.appendChild(cell);
+  }
+}
+
+buildMoodChart();
+buildStreak();
+buildHeatmap();
+</script>
