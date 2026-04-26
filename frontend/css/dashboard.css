@@ -1,0 +1,192 @@
+/* dashboard.css */
+.dash-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: calc(100vh - 60px);
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--charcoal);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+}
+.sidebar-link:hover, .sidebar-link.active {
+  background: var(--teal-light);
+  color: var(--teal);
+  text-decoration: none;
+}
+.sidebar-link .icon { font-size: 18px; width: 22px; }
+.sidebar-divider { height: 1px; background: var(--border); margin: 10px 0; }
+.sidebar-bottom { margin-top: auto; }
+
+/* Main content */
+.dash-main {
+  padding: 28px 32px;
+  overflow-y: auto;
+}
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.dash-header h1 { font-size: 22px; font-weight: 700; color: var(--charcoal); }
+.dash-header p { font-size: 13px; color: var(--rose); margin-top: 2px; }
+.role-badge {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--berry-light);
+  color: var(--berry);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Burnout Radar */
+.radar-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+  margin-bottom: 24px;
+  border: 0.5px solid var(--border);
+}
+.radar-card h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--charcoal);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.radar-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+.radar-metric {
+  text-align: center;
+  padding: 20px 16px;
+  border-radius: var(--radius);
+  background: var(--cream);
+}
+.radar-metric .label { font-size: 12px; font-weight: 600; color: var(--rose); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.radar-metric .value { font-size: 36px; font-weight: 800; line-height: 1; }
+.radar-metric .sub { font-size: 12px; color: var(--rose); margin-top: 6px; }
+
+/* Burnout meter */
+.meter-wrap { margin-top: 20px; }
+.meter-bar {
+  height: 12px;
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+.meter-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease;
+}
+.meter-fill.low { background: var(--ok); }
+.meter-fill.moderate { background: var(--warn); }
+.meter-fill.high { background: #E67E22; }
+.meter-fill.critical { background: var(--danger); }
+.meter-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--rose); }
+
+/* Level colors */
+.level-low { color: var(--ok); }
+.level-moderate { color: var(--warn); }
+.level-high { color: #E67E22; }
+.level-critical { color: var(--danger); }
+
+/* Support section */
+.support-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.support-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  border: 0.5px solid var(--border);
+  border-top: 3px solid;
+}
+.support-card.micro { border-top-color: var(--teal); }
+.support-card.guided { border-top-color: var(--berry); }
+.support-card.emergency { border-top-color: var(--danger); }
+.support-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.support-card p { font-size: 13px; color: var(--rose); margin-bottom: 14px; }
+.support-tools { display: flex; flex-direction: column; gap: 6px; }
+.tool-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--cream);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.tool-item:hover { background: var(--teal-light); color: var(--teal); }
+
+/* Emergency alert */
+.emergency-alert {
+  background: #FDECEA;
+  border: 1.5px solid var(--danger);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+  display: none;
+}
+.emergency-alert.visible { display: flex; }
+.emergency-alert .alert-icon { font-size: 24px; }
+.emergency-alert p { font-size: 13px; color: #7B241C; flex: 1; }
+
+/* Women safe mode banner */
+.women-safe-banner {
+  background: linear-gradient(135deg, var(--berry-light), #F0E4EC);
+  border: 1px solid #E8C5D5;
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.women-safe-banner p { font-size: 13px; color: var(--berry); flex: 1; }
+
+@media (max-width: 900px) {
+  .dash-layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .support-grid { grid-template-columns: 1fr; }
+  .radar-grid { grid-template-columns: 1fr 1fr; }
+  .dash-main { padding: 16px; }
+}

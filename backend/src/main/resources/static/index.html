@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karmic AI — For India's Doctors</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #0D1F2D;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 48px; height: 64px;
+  background: rgba(13,31,45,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.brand {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; color: #A8EBF0;
+}
+.brand span { color: #D98BAB; }
+
+.nav-r { display: flex; align-items: center; gap: 10px; }
+.nav-r a {
+  padding: 8px 18px; border-radius: 40px;
+  font-size: 13px; font-weight: 500;
+  color: rgba(255,255,255,0.6);
+  transition: color 0.15s;
+}
+.nav-r a:hover { color: #fff; }
+.nav-r .cta {
+  background: #028090; color: #fff;
+  font-weight: 600; padding: 8px 22px;
+}
+.nav-r .cta:hover { background: #01606E; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 100px 24px 80px;
+  position: relative; overflow: hidden;
+  text-align: center;
+}
+
+.hero-glow {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 65% 55% at 30% 60%, rgba(56,178,202,0.28), transparent 55%),
+    radial-gradient(ellipse 40% 50% at 70% 35%, rgba(109,46,70,0.18), transparent 50%);
+}
+
+.hero-content { position: relative; z-index: 1; max-width: 680px; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 6px 16px; border-radius: 40px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.6); text-transform: uppercase;
+  margin-bottom: 36px;
+}
+.live { width: 6px; height: 6px; border-radius: 50%; background: #6DDECF; animation: lp 2s infinite; }
+@keyframes lp { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.5)} }
+
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(40px, 7vw, 76px);
+  font-weight: 400; line-height: 1.06;
+  letter-spacing: -1.5px; margin-bottom: 24px;
+  color: #fff;
+}
+.hero h1 em { font-style: italic; color: #A8EBF0; }
+.hero h1 .rose { color: #D98BAB; }
+
+.hero-sub {
+  font-size: clamp(16px, 2vw, 18px);
+  color: rgba(255,255,255,0.5);
+  max-width: 440px; margin: 0 auto 44px;
+  line-height: 1.75; font-weight: 300;
+}
+
+.hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+.btn-main {
+  background: #fff; color: #01606E;
+  padding: 15px 36px; border-radius: 50px;
+  font-size: 15px; font-weight: 700;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: inline-block;
+}
+.btn-main:hover { transform: translateY(-2px); box-shadow: 0 14px 42px rgba(0,0,0,0.35); }
+
+.btn-ghost {
+  background: rgba(255,255,255,0.08);
+  border: 1.5px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.8);
+  padding: 15px 32px; border-radius: 50px;
+  font-size: 15px; font-weight: 500;
+  transition: background 0.2s; display: inline-block;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+/* Privacy chips below hero CTA */
+.trust-row {
+  display: flex; gap: 10px; justify-content: center;
+  flex-wrap: wrap; margin-top: 28px;
+}
+.trust-chip {
+  font-size: 12px; color: rgba(255,255,255,0.4);
+  display: flex; align-items: center; gap: 5px;
+}
+.trust-chip::before { content: '✓'; color: #6DDECF; font-weight: 700; }
+
+/* ── STATS ── */
+.stats {
+  background: rgba(255,255,255,0.03);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.stats-inner {
+  max-width: 900px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(3,1fr);
+}
+.stat {
+  padding: 40px 32px; text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.stat:last-child { border-right: none; }
+.stat-n {
+  font-family: 'DM Serif Display', serif;
+  font-size: 48px; color: #A8EBF0; line-height: 1; margin-bottom: 8px;
+}
+.stat-l { font-size: 13px; color: rgba(255,255,255,0.4); }
+
+/* ── FEATURES ── */
+.features {
+  padding: 100px 24px;
+  max-width: 1000px; margin: 0 auto;
+}
+.feat-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 2px; border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px; overflow: hidden;
+  background: rgba(255,255,255,0.05);
+}
+.feat {
+  padding: 32px 28px;
+  background: rgba(255,255,255,0.03);
+  transition: background 0.2s;
+}
+.feat:hover { background: rgba(255,255,255,0.06); }
+.feat-ico {
+  font-size: 24px; margin-bottom: 16px;
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06);
+}
+.feat h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: #fff; }
+.feat p { font-size: 13px; color: rgba(255,255,255,0.45); line-height: 1.65; }
+
+.sec-label {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: #028090; margin-bottom: 14px;
+  text-align: center;
+}
+.sec-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(26px, 4vw, 40px); font-weight: 400;
+  color: #fff; line-height: 1.2; text-align: center;
+  margin-bottom: 48px;
+}
+.sec-title em { font-style: italic; color: #D98BAB; }
+
+/* ── PRIVACY SECTION ── */
+.priv-section {
+  padding: 100px 24px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.priv-inner {
+  max-width: 800px; margin: 0 auto; text-align: center;
+}
+.priv-list {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; max-width: 580px; margin: 32px auto 0;
+  text-align: left;
+}
+.priv-item {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13.5px; color: rgba(255,255,255,0.6);
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+}
+.priv-item::before { content: '🔒'; font-size: 14px; flex-shrink: 0; }
+
+/* ── CTA ── */
+.cta-section {
+  padding: 100px 24px;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.cta-section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(30px, 5vw, 52px); font-weight: 400;
+  color: #fff; line-height: 1.15; margin-bottom: 16px;
+}
+.cta-section h2 em { font-style: italic; color: #D98BAB; }
+.cta-section p { color: rgba(255,255,255,0.45); font-size: 16px; margin-bottom: 36px; }
+
+/* ── FOOTER ── */
+footer {
+  padding: 28px 48px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  flex-wrap: wrap; gap: 12px;
+}
+footer .brand { font-size: 17px; }
+footer p { font-size: 12px; color: rgba(255,255,255,0.2); }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { font-size: 12px; color: rgba(255,255,255,0.25); transition: color 0.15s; }
+.footer-links a:hover { color: rgba(255,255,255,0.6); }
+
+/* ── FADE IN ── */
+.fi { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.fi.v { opacity: 1; transform: translateY(0); }
+.fd1 { transition-delay: 0.1s; } .fd2 { transition-delay: 0.2s; } .fd3 { transition-delay: 0.3s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .nav-r a:not(.cta) { display: none; }
+  .stats-inner { grid-template-columns: 1fr; }
+  .stat { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 28px 20px; }
+  .feat-grid { grid-template-columns: 1fr; }
+  .priv-list { grid-template-columns: 1fr; }
+  .features, .priv-section, .cta-section { padding: 64px 20px; }
+  footer { flex-direction: column; text-align: center; padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="brand">Karmic <span>AI</span></div>
+  <div class="nav-r">
+    <a href="#how">How it works</a>
+    <a href="signup.html?login=true">Log In</a>
+    <a href="signup.html" class="cta">Get Started</a>
+    <a href="admin-login.html" style="padding:8px 18px;border-radius:40px;font-size:13px;font-weight:600;background:rgba(109,46,70,0.3);border:1px solid rgba(109,46,70,0.5);color:#D98BAB">🏥 Admin</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <h1>
+      Burnout doesn't wait.<br>
+      <em>Neither should</em> <span class="rose">you.</span>
+    </h1>
+    <p class="hero-sub">
+      A 90-second daily check-in that tracks your burnout, predicts when it'll worsen, and connects you to the right support — right now.
+    </p>
+    <div class="hero-btns">
+      <a href="signup.html" class="btn-main">Start for Free — 90 Seconds →</a>
+      <a href="signup.html?login=true" class="btn-ghost">Log In</a>
+    </div>
+    <div class="trust-row">
+      <span class="trust-chip">Zero-knowledge anonymous</span>
+      <span class="trust-chip">Hospital sees dept avg only</span>
+      <span class="trust-chip">Raw answers never stored</span>
+      <span class="trust-chip">DPDP Act 2023 compliant</span>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stats-inner">
+    <div class="stat fi">
+      <div class="stat-n">1 in 3</div>
+      <div class="stat-l">Indian resident doctors has severe depression · JAPI 2021</div>
+    </div>
+    <div class="stat fi fd1">
+      <div class="stat-n">76%</div>
+      <div class="stat-l">Medical students report burnout · IJP 2022</div>
+    </div>
+    <div class="stat fi fd2">
+      <div class="stat-n">2×</div>
+      <div class="stat-l">Women doctors burn out at twice the rate · Lancet 2022</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="how">
+  <div class="sec-label fi">What you get</div>
+  <h2 class="sec-title fi fd1">Everything you need.<br><em>Nothing you don't.</em></h2>
+  <div class="feat-grid">
+    <div class="feat fi">
+      <div class="feat-ico">📡</div>
+      <h3>Burnout Radar</h3>
+      <p>90-second daily check-in. Current level, 7-day trend, and an AI forecast — so you see it coming.</p>
+    </div>
+    <div class="feat fi fd1">
+      <div class="feat-ico">⚡</div>
+      <h3>Auto-matched support</h3>
+      <p>Low? Breathing tool. High? Peer room + helpline. Critical? Escalation. Always the right response.</p>
+    </div>
+    <div class="feat fi fd2">
+      <div class="feat-ico">💬</div>
+      <h3>Peer rooms</h3>
+      <p>ICU nights. Exam pressure. Workplace challenges. Talk to doctors who understand — anonymously.</p>
+    </div>
+    <div class="feat fi">
+      <div class="feat-ico">👩‍⚕️</div>
+      <h3>Women-Safe Mode</h3>
+      <p>One toggle. Cycle-aware tracking, women-only rooms, and gender-specific resources.</p>
+    </div>
+    <div class="feat fi fd1">
+      <div class="feat-ico">🔒</div>
+      <h3>Zero-knowledge privacy</h3>
+      <p>Your hospital sees dept averages only. No names. No individual scores. Architecturally impossible.</p>
+    </div>
+    <div class="feat fi fd2">
+      <div class="feat-ico">🏥</div>
+      <h3>Role-based dashboard</h3>
+      <p>Intern, junior resident, senior, or consultant — tools and thresholds adapt to your stage.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRIVACY -->
+<section class="priv-section">
+  <div class="priv-inner">
+    <div class="sec-label fi">Privacy</div>
+    <h2 class="sec-title fi fd1">We cannot identify you.<br><em>By design.</em></h2>
+    <p class="fi fd2" style="color:rgba(255,255,255,.45);font-size:15px;max-width:480px;margin:0 auto">
+      Every architectural decision was made with one question: how do we make individual identification technically impossible?
+    </p>
+    <div class="priv-list fi fd2">
+      <div class="priv-item">Email SHA-256 hashed before storage</div>
+      <div class="priv-item">Check-in answers discarded after scoring</div>
+      <div class="priv-item">You appear as anon-XXXXXX everywhere</div>
+      <div class="priv-item">Admin sees dept averages only</div>
+      <div class="priv-item">Peer messages ephemeral — 24h max</div>
+      <div class="priv-item">No PII ever written to disk</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="fi">
+    You give everything.<br>
+    <em>Let someone give back.</em>
+  </h2>
+  <p class="fi fd1">Anonymous. Free. 90 seconds a day.</p>
+  <div class="fi fd2">
+    <a href="signup.html" class="btn-main">Start Your First Check-In →</a>
+  </div>
+  <p class="fi fd3" style="margin-top:16px;font-size:12px;color:rgba(255,255,255,.25)">No card required · No hospital access to your data</p>
+</section>
+
+<footer>
+  <div class="brand">Karmic <span>AI</span></div>
+  <p>© 2024 Karmic AI · DPDP Act 2023 Compliant · Built for India's healers</p>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="signup.html">Sign Up</a>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(e => {
+  e.forEach(el => { if (el.isIntersecting) el.target.classList.add('v'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.fi').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

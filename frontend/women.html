@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Women Support — Karmic AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+:root{
+  --berry:#6D2E46;--berry-l:#F5EAF0;--berry-m:#E8C5D5;
+  --teal:#028090;--teal-l:#E1F5EE;--teal-d:#01606E;
+  --cream:#F5F0E8;--rose:#A26769;--charcoal:#2C2C2C;
+  --white:#fff;--border:#E0DBD0;--shadow:0 2px 12px rgba(0,0,0,.07);--r:12px;
+  --phase-m:#E74C3C;--phase-f:#28B463;--phase-o:#E67E22;--phase-l:#8E44AD;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--cream);color:var(--charcoal);font-size:15px;line-height:1.6}
+
+/* NAV */
+.nav{background:#fff;border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.nav-brand{font-family:'DM Serif Display',serif;font-size:20px;color:var(--teal)}
+.nav-brand span{color:var(--berry)}
+.nav-links{display:flex;gap:8px;align-items:center}
+.nav-links a{padding:7px 14px;border-radius:8px;color:var(--charcoal);font-size:14px;font-weight:500;text-decoration:none;transition:background .15s}
+.nav-links a:hover,.nav-links a.active{background:var(--berry-l);color:var(--berry)}
+
+/* PRIV STRIP */
+.pstrip{background:var(--charcoal);color:rgba(255,255,255,.55);font-size:12px;padding:8px 20px;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.pstrip strong{color:rgba(255,255,255,.9)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 96px)}
+
+/* SIDEBAR */
+.sidebar{background:#fff;border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:4px}
+.slink{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:var(--charcoal);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s;text-decoration:none}
+.slink:hover,.slink.active{background:var(--berry-l);color:var(--berry)}
+.slink .ico{font-size:17px;width:22px}
+.sdivider{height:1px;background:var(--border);margin:10px 0}
+.sbottom{margin-top:auto}
+
+/* MAIN */
+.main{padding:28px 32px;overflow-y:auto;max-width:900px}
+.page-hero{background:linear-gradient(135deg,var(--berry),#9B3A5A);border-radius:16px;padding:28px 32px;margin-bottom:28px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.page-hero h1{font-family:'DM Serif Display',serif;font-size:26px;font-weight:400;margin-bottom:6px}
+.page-hero p{font-size:13px;opacity:.8;max-width:420px;line-height:1.6}
+.page-hero-ico{font-size:56px;opacity:.9}
+.anon-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;margin-top:12px}
+
+/* SECTION HEADER */
+.sh{font-size:16px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sh span{font-size:20px}
+
+/* CARD */
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:22px 24px;border:.5px solid var(--border);margin-bottom:20px}
+
+/* CYCLE TRACKER */
+.cycle-phases{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.phase-card{border-radius:10px;padding:14px 12px;text-align:center;border:2px solid transparent;cursor:pointer;transition:all .15s;position:relative}
+.phase-card.menstrual{background:#FEF0EF;border-color:var(--phase-m)}
+.phase-card.follicular{background:#EBF9F2;border-color:var(--phase-f)}
+.phase-card.ovulation{background:#FEF6EC;border-color:var(--phase-o)}
+.phase-card.luteal{background:#F4ECF7;border-color:var(--phase-l)}
+.phase-card.current::after{content:'← Now';position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--charcoal);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.phase-ico{font-size:24px;margin-bottom:6px}
+.phase-name{font-size:12px;font-weight:700;margin-bottom:3px}
+.phase-days{font-size:11px;color:var(--rose)}
+.phase-card.menstrual .phase-name{color:var(--phase-m)}
+.phase-card.follicular .phase-name{color:var(--phase-f)}
+.phase-card.ovulation .phase-name{color:var(--phase-o)}
+.phase-card.luteal .phase-name{color:var(--phase-l)}
+
+.cycle-input-row{display:flex;gap:12px;align-items:flex-end;margin-bottom:16px;flex-wrap:wrap}
+.fg{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px}
+.fg label{font-size:12px;font-weight:600;color:var(--rose)}
+.fg input,.fg select{padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;background:#fff;outline:none;transition:border-color .15s}
+.fg input:focus,.fg select:focus{border-color:var(--berry)}
+.btn-berry{background:var(--berry);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;white-space:nowrap}
+.btn-berry:hover{opacity:.88}
+
+.cycle-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.cs-item{background:var(--cream);border-radius:10px;padding:14px 16px;text-align:center}
+.cs-num{font-family:'DM Serif Display',serif;font-size:28px;color:var(--berry);line-height:1}
+.cs-lbl{font-size:12px;color:var(--rose);margin-top:4px}
+
+/* CORRELATION */
+.correlation-card{display:flex;gap:16px;align-items:flex-start;padding:16px 18px;border-radius:10px;margin-bottom:10px;border:1px solid}
+.correlation-card.info{background:#EBF5FB;border-color:#AED6F1}
+.correlation-card.warn{background:#FEF9E7;border-color:#F9E79F}
+.correlation-card.positive{background:#EBF9F2;border-color:#A9DFBF}
+.correlation-ico{font-size:22px;flex-shrink:0;margin-top:2px}
+.correlation-body h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.correlation-body p{font-size:12.5px;color:#555;line-height:1.55}
+
+/* BURNOUT-PHASE CHART */
+.bpchart{display:flex;align-items:flex-end;gap:6px;height:80px;margin:16px 0}
+.bpchart-bar{flex:1;border-radius:6px 6px 0 0;transition:height .6s ease;position:relative;min-height:8px}
+.bpchart-bar::after{content:attr(data-lbl);position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--rose);white-space:nowrap}
+.bpchart-bar.m{background:#E74C3C}
+.bpchart-bar.fo{background:#28B463}
+.bpchart-bar.o{background:#E67E22}
+.bpchart-bar.l{background:#8E44AD}
+.bpchart-bar.current-bar{box-shadow:0 0 0 3px rgba(0,0,0,.15)}
+.bpchart-wrap{margin-bottom:24px}
+
+/* PEER ROOMS */
+.room-grid{display:flex;flex-direction:column;gap:10px}
+.wroom{display:flex;align-items:center;gap:14px;padding:14px 18px;background:#fff;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;transition:all .15s;text-decoration:none;color:var(--charcoal)}
+.wroom:hover{border-color:var(--berry);background:var(--berry-l)}
+.wroom-ico{font-size:24px;width:44px;height:44px;border-radius:50%;background:var(--berry-l);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wroom-body{flex:1}
+.wroom-body h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.wroom-body p{font-size:12px;color:var(--rose)}
+.wroom-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.online-badge{background:var(--berry);color:#fff;font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#27AE60;display:inline-block;animation:pd 2s infinite}
+@keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+
+/* INCIDENT LOG */
+.incident-form{display:flex;flex-direction:column;gap:14px}
+.incident-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.icat{border:2px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;font-size:13px;font-weight:500}
+.icat:hover{border-color:var(--berry)}
+.icat.selected{border-color:var(--berry);background:var(--berry-l);color:var(--berry)}
+.icat-ico{font-size:20px;display:block;margin-bottom:5px}
+textarea.itxt{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:80px;outline:none;transition:border-color .15s}
+textarea.itxt:focus{border-color:var(--berry)}
+.anon-guarantee{background:var(--cream);border:1px solid var(--border);border-radius:8px;padding:12px 16px;font-size:12.5px;color:var(--rose);display:flex;align-items:flex-start;gap:8px;line-height:1.55}
+.submit-incident{background:var(--berry);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.submit-incident:hover{opacity:.88}
+.success-msg{background:#EBF9F2;border:1.5px solid #A9DFBF;border-radius:10px;padding:14px 18px;font-size:13px;color:#1A7A3F;display:none;align-items:center;gap:10px}
+.success-msg.show{display:flex}
+
+/* RESOURCES */
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.res-card{background:var(--cream);border-radius:10px;padding:16px;border:1px solid var(--border);transition:all .15s;cursor:pointer}
+.res-card:hover{border-color:var(--berry);background:var(--berry-l);transform:translateY(-2px)}
+.res-card-ico{font-size:26px;margin-bottom:8px}
+.res-card h4{font-size:13px;font-weight:700;margin-bottom:4px}
+.res-card p{font-size:12px;color:var(--rose);line-height:1.5}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--charcoal);color:#fff;padding:12px 24px;border-radius:40px;font-size:14px;font-weight:500;z-index:500;transition:transform .3s;display:flex;align-items:center;gap:10px;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:768px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .cycle-phases{grid-template-columns:repeat(2,1fr)}
+  .cycle-summary{grid-template-columns:1fr 1fr}
+  .incident-select-grid{grid-template-columns:repeat(2,1fr)}
+  .res-grid{grid-template-columns:1fr 1fr}
+  .main{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">Karmic <span>AI</span></div>
+  <div class="nav-links">
+    <a href="dashboard.html">← Dashboard</a>
+    <a href="peer.html">Peer Rooms</a>
+    <a href="women.html" class="active">Women Support</a>
+    <a href="#" onclick="logout()">Log Out</a>
+  </div>
+</nav>
+
+<div class="pstrip">
+  <span>🔒 You are <strong id="anonId">anon-••••••</strong></span>
+  <span>🚫 No names stored · <strong>incident reports fully anonymous</strong></span>
+  <span>👩‍⚕️ <strong>Women-Safe Mode</strong> active</span>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <a class="slink" href="dashboard.html"><span class="ico">📡</span>Burnout Radar</a>
+    <a class="slink active" href="women.html"><span class="ico">👩‍⚕️</span>Women Support</a>
+    <a class="slink" href="peer.html"><span class="ico">💬</span>Peer Rooms</a>
+    <div class="sdivider"></div>
+    <a class="slink" href="#cycle" onclick="scrollTo('cycle')"><span class="ico">🌙</span>Cycle Tracker</a>
+    <a class="slink" href="#correlation"><span class="ico">📊</span>Burnout Insight</a>
+    <a class="slink" href="#rooms"><span class="ico">💬</span>Women Rooms</a>
+    <a class="slink" href="#incident"><span class="ico">🛡️</span>Incident Log</a>
+    <div class="sbottom">
+      <div style="padding:10px 14px;font-size:11px;color:var(--rose);line-height:1.6">🔒 All data anonymous<br><span style="opacity:.6">DPDP Act 2023 compliant</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- PAGE HERO -->
+    <div class="page-hero">
+      <div>
+        <h1>Women Support</h1>
+        <p>A safe space built specifically for women doctors — cycle-aware burnout tracking, women-only peer rooms, and anonymous incident reporting.</p>
+        <div class="anon-pill">🔒 Fully anonymous · No identity stored</div>
+      </div>
+      <div class="page-hero-ico">👩‍⚕️</div>
+    </div>
+
+    <!-- CYCLE TRACKER -->
+    <div id="cycle">
+      <div class="sh"><span>🌙</span> Cycle Tracker</div>
+      <div class="card">
+        <div class="cycle-input-row">
+          <div class="fg">
+            <label>Last period date</label>
+            <input type="date" id="lastPeriod">
+          </div>
+          <div class="fg">
+            <label>Cycle length (days)</label>
+            <select id="cycleLen">
+              <option value="28">28 days (average)</option>
+              <option value="24">24 days</option>
+              <option value="25">25 days</option>
+              <option value="26">26 days</option>
+              <option value="27">27 days</option>
+              <option value="29">29 days</option>
+              <option value="30">30 days</option>
+              <option value="32">32 days</option>
+              <option value="35">35 days</option>
+            </select>
+          </div>
+          <button class="btn-berry" onclick="calcCycle()">Update →</button>
+        </div>
+
+        <!-- Current phase display -->
+        <div class="cycle-phases">
+          <div class="phase-card menstrual" id="ph-m">
+            <div class="phase-ico">🔴</div>
+            <div class="phase-name">Menstrual</div>
+            <div class="phase-days">Days 1–5</div>
+          </div>
+          <div class="phase-card follicular" id="ph-f">
+            <div class="phase-ico">🌱</div>
+            <div class="phase-name">Follicular</div>
+            <div class="phase-days">Days 6–13</div>
+          </div>
+          <div class="phase-card ovulation" id="ph-o">
+            <div class="phase-ico">⭕</div>
+            <div class="phase-name">Ovulation</div>
+            <div class="phase-days">Day 14</div>
+          </div>
+          <div class="phase-card luteal" id="ph-l">
+            <div class="phase-ico">🌙</div>
+            <div class="phase-name">Luteal</div>
+            <div class="phase-days">Days 15–28</div>
+          </div>
+        </div>
+
+        <div class="cycle-summary">
+          <div class="cs-item">
+            <div class="cs-num" id="dayOfCycle">—</div>
+            <div class="cs-lbl">Day of cycle</div>
+          </div>
+          <div class="cs-item">
+            <div class="cs-num" id="daysToNext">—</div>
+            <div class="cs-lbl">Days to next period</div>
+          </div>
+          <div class="cs-item">
+            <div class="cs-num" id="currentPhaseLabel" style="font-size:16px;padding-top:6px">—</div>
+            <div class="cs-lbl">Current phase</div>
+          </div>
+        </div>
+
+        <p style="font-size:12px;color:var(--rose);margin-top:14px;display:flex;align-items:center;gap:6px">
+          🔒 Stored locally on your device only. Never sent to any server.
+        </p>
+      </div>
+    </div>
+
+    <!-- BURNOUT CORRELATION -->
+    <div id="correlation">
+      <div class="sh"><span>📊</span> Mood & Burnout — Cycle Correlation</div>
+      <div class="card">
+        <p style="font-size:13px;color:var(--rose);margin-bottom:16px">How burnout scores typically relate to each cycle phase, based on hormonal patterns. Your personal pattern may differ — track for 2+ cycles to see yours.</p>
+
+        <!-- Simple bar chart -->
+        <div class="bpchart-wrap">
+          <div class="bpchart" id="bpChart">
+            <div class="bpchart-bar m" id="bar-m" style="height:70%" data-lbl="Menstrual"></div>
+            <div class="bpchart-bar fo" id="bar-f" style="height:30%" data-lbl="Follicular"></div>
+            <div class="bpchart-bar o" id="bar-o" style="height:25%" data-lbl="Ovulation"></div>
+            <div class="bpchart-bar l" id="bar-l" style="height:55%" data-lbl="Luteal"></div>
+          </div>
+          <p style="font-size:11px;color:var(--rose);margin-top:24px;text-align:center">Typical burnout intensity by phase (higher = more challenging)</p>
+        </div>
+
+        <div id="phaseInsights">
+          <div class="correlation-card warn">
+            <div class="correlation-ico">🌙</div>
+            <div class="correlation-body">
+              <h4>Complete a check-in to see your personalised phase insight</h4>
+              <p>Once you've logged your cycle dates and completed a burnout check-in, we'll show you how your current phase may be contributing to what you're feeling today.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WOMEN-ONLY PEER ROOMS -->
+    <div id="rooms">
+      <div class="sh"><span>💬</span> Women-Only Peer Rooms</div>
+      <p style="font-size:13px;color:var(--rose);margin-bottom:16px">These rooms are visible only to users with Women-Safe Mode enabled. Your anonymous ID is the same across all rooms.</p>
+      <div class="room-grid">
+        <a class="wroom" href="peer.html">
+          <div class="wroom-ico">👶</div>
+          <div class="wroom-body">
+            <h4>Maternity & Return to Work</h4>
+            <p>Pregnancy in residency, maternity leave, pumping on call, returning after baby</p>
+          </div>
+          <div class="wroom-right">
+            <span class="online-badge"><span class="live-dot" style="width:5px;height:5px;margin:0 3px 0 0;display:inline-block"></span>8 online</span>
+            <span style="font-size:10px;color:var(--rose)">Active now</span>
+          </div>
+        </a>
+        <a class="wroom" href="peer.html">
+          <div class="wroom-ico">⚖️</div>
+          <div class="wroom-body">
+            <h4>Workplace Challenges</h4>
+            <p>Gender bias, being taken less seriously, hierarchy struggles, double standards</p>
+          </div>
+          <div class="wroom-right">
+            <span class="online-badge"><span class="live-dot" style="width:5px;height:5px;margin:0 3px 0 0;display:inline-block"></span>12 online</span>
+            <span style="font-size:10px;color:var(--rose)">5 min ago</span>
+          </div>
+        </a>
+        <a class="wroom" href="peer.html">
+          <div class="wroom-ico">🌙</div>
+          <div class="wroom-body">
+            <h4>Night Shifts & Safety</h4>
+            <p>Staying safe on nights, transport, on-call room issues, feeling vulnerable</p>
+          </div>
+          <div class="wroom-right">
+            <span class="online-badge"><span class="live-dot" style="width:5px;height:5px;margin:0 3px 0 0;display:inline-block"></span>6 online</span>
+            <span style="font-size:10px;color:var(--rose)">2 min ago</span>
+          </div>
+        </a>
+        <a class="wroom" href="peer.html">
+          <div class="wroom-ico">🛡️</div>
+          <div class="wroom-body">
+            <h4>Harassment Support</h4>
+            <p>Safe space to share experiences, get peer support, understand your options</p>
+          </div>
+          <div class="wroom-right">
+            <span class="online-badge"><span class="live-dot" style="width:5px;height:5px;margin:0 3px 0 0;display:inline-block"></span>4 online</span>
+            <span style="font-size:10px;color:var(--rose)">8 min ago</span>
+          </div>
+        </a>
+        <a class="wroom" href="peer.html">
+          <div class="wroom-ico">💝</div>
+          <div class="wroom-body">
+            <h4>General Women's Wellbeing</h4>
+            <p>Open space — anything you need to talk about</p>
+          </div>
+          <div class="wroom-right">
+            <span class="online-badge"><span class="live-dot" style="width:5px;height:5px;margin:0 3px 0 0;display:inline-block"></span>19 online</span>
+            <span style="font-size:10px;color:var(--rose)">Just now</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- INCIDENT LOG -->
+    <div id="incident" style="margin-top:28px">
+      <div class="sh"><span>🛡️</span> Incident Log <span style="font-size:12px;font-weight:400;color:var(--rose);margin-left:4px">— Anonymous & Optional</span></div>
+      <div class="card">
+        <p style="font-size:13px;color:var(--rose);margin-bottom:18px">Log workplace incidents anonymously. This helps surface patterns at the institutional level without ever identifying you. No names, no timestamps linked to identity.</p>
+
+        <div class="incident-form" id="incidentForm">
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--rose);margin-bottom:8px">Category</div>
+            <div class="incident-select-grid">
+              <div class="icat" onclick="selCat(this,'harassment')"><span class="icat-ico">🚫</span>Harassment</div>
+              <div class="icat" onclick="selCat(this,'discrimination')"><span class="icat-ico">⚖️</span>Discrimination</div>
+              <div class="icat" onclick="selCat(this,'safety')"><span class="icat-ico">⚠️</span>Safety Concern</div>
+              <div class="icat" onclick="selCat(this,'bias')"><span class="icat-ico">👁️</span>Gender Bias</div>
+              <div class="icat" onclick="selCat(this,'workload')"><span class="icat-ico">📋</span>Unfair Workload</div>
+              <div class="icat" onclick="selCat(this,'other')"><span class="icat-ico">💬</span>Other</div>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label>Department (optional)</label>
+            <select id="incDept">
+              <option value="">Prefer not to say</option>
+              <option>Emergency Medicine</option>
+              <option>Intensive Care (ICU)</option>
+              <option>Surgery</option>
+              <option>Internal Medicine</option>
+              <option>Obstetrics & Gynaecology</option>
+              <option>Paediatrics</option>
+              <option>Radiology</option>
+              <option>Psychiatry</option>
+              <option>Other</option>
+            </select>
+          </div>
+
+          <div class="fg">
+            <label>What happened? (optional — the category alone is enough)</label>
+            <textarea class="itxt" id="incText" placeholder="Describe briefly if you wish. Or just submit the category — that alone is valuable data."></textarea>
+          </div>
+
+          <div class="anon-guarantee">
+            🔒 This report contains <strong>no name, no email, no timestamp linked to you</strong>. It is stored as an anonymous category count only. You cannot be identified from this submission.
+          </div>
+
+          <button class="submit-incident" onclick="submitIncident()">Submit Anonymously →</button>
+        </div>
+
+        <div class="success-msg" id="successMsg">
+          <span style="font-size:20px">✅</span>
+          <div>
+            <strong style="display:block;margin-bottom:3px">Reported anonymously.</strong>
+            Anonymous category data helps institutions identify patterns. You cannot be identified from this.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div style="margin-top:28px;margin-bottom:32px">
+      <div class="sh"><span>📞</span> Resources for Women Doctors</div>
+      <div class="res-grid">
+        <div class="res-card" onclick="showToast('📞','Dialling iCall…');window.location.href='tel:9152987821'">
+          <div class="res-card-ico">📞</div>
+          <h4>iCall Helpline</h4>
+          <p>9152987821 · Free · Trained counselors · Confidential</p>
+        </div>
+        <div class="res-card" onclick="window.open('https://icallhelpline.org','_blank')">
+          <div class="res-card-ico">💻</div>
+          <h4>iCall Online Chat</h4>
+          <p>Text a counselor at icallhelpline.org — no phone needed</p>
+        </div>
+        <div class="res-card" onclick="showToast('🫁','Starting box breathing…')">
+          <div class="res-card-ico">🫁</div>
+          <h4>Box Breathing</h4>
+          <p>4-minute guided technique. Evidence-based acute stress relief.</p>
+        </div>
+        <div class="res-card" onclick="showToast('📋','POSH Act info loading…')">
+          <div class="res-card-ico">📋</div>
+          <h4>POSH Act Rights</h4>
+          <p>Know your rights under the Prevention of Sexual Harassment Act</p>
+        </div>
+        <div class="res-card" onclick="showToast('🌙','Sleep hygiene kit loading…')">
+          <div class="res-card-ico">🌙</div>
+          <h4>Sleep Hygiene Kit</h4>
+          <p>Practical tips adapted for night-shift and post-call schedules</p>
+        </div>
+        <div class="res-card" onclick="showToast('📓','Opening journal…')">
+          <div class="res-card-ico">📓</div>
+          <h4>Reflective Journal</h4>
+          <p>3-question private journaling. Stored locally, never uploaded.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"><span id="toastIco">✅</span><span id="toastTxt">Done</span></div>
+
+<script>
+// ── CYCLE TRACKER ─────────────────────────────────────────────────
+const PHASE_INFO = {
+  menstrual: {
+    id:'ph-m', name:'Menstrual', range:'Days 1–5',
+    burnout:'Higher fatigue and mood changes are common. Prostaglandins can cause physical discomfort that compounds work stress.',
+    tip:'Prioritise rest where possible. Avoid scheduling high-stakes presentations if you can control timing.',
+    type:'warn', barH:'70%'
+  },
+  follicular: {
+    id:'ph-f', name:'Follicular', range:'Days 6–13',
+    burnout:'Oestrogen rise often brings improved mood, energy, and sharper focus. Many doctors feel most capable in this phase.',
+    tip:'This is often your strongest phase. Schedule complex tasks, difficult conversations, or learning new procedures here.',
+    type:'positive', barH:'30%'
+  },
+  ovulation: {
+    id:'ph-o', name:'Ovulation', range:'~Day 14',
+    burnout:'Peak oestrogen and LH. Communication and collaboration often feel easier. High energy but can bring heightened emotional sensitivity.',
+    tip:'Great time for team discussions, patient communication, and leadership tasks.',
+    type:'positive', barH:'25%'
+  },
+  luteal: {
+    id:'ph-l', name:'Luteal', range:'Days 15–28',
+    burnout:'Progesterone rise can cause fatigue, irritability, and difficulty concentrating — especially in the week before your period. Burnout symptoms often feel amplified.',
+    tip:'Late luteal phase is when self-care matters most. Reduce unnecessary cognitive load where possible.',
+    type:'warn', barH:'55%'
+  }
+};
+
+let selectedCat = '';
+
+function calcCycle() {
+  const dateVal = document.getElementById('lastPeriod').value;
+  const cycleLen = parseInt(document.getElementById('cycleLen').value);
+  if (!dateVal) { showToast('📅', 'Please enter your last period date'); return; }
+
+  const lastDate = new Date(dateVal);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  lastDate.setHours(0,0,0,0);
+
+  const daysSince = Math.floor((today - lastDate) / 86400000);
+  const dayOfCycle = (daysSince % cycleLen) + 1;
+  const daysToNext = cycleLen - dayOfCycle + 1;
+
+  document.getElementById('dayOfCycle').textContent = dayOfCycle;
+  document.getElementById('daysToNext').textContent = daysToNext;
+
+  // Determine phase
+  let phase;
+  if (dayOfCycle <= 5)            phase = 'menstrual';
+  else if (dayOfCycle <= 13)      phase = 'follicular';
+  else if (dayOfCycle === 14)     phase = 'ovulation';
+  else                            phase = 'luteal';
+
+  document.getElementById('currentPhaseLabel').textContent = PHASE_INFO[phase].name;
+
+  // Highlight phase cards
+  ['menstrual','follicular','ovulation','luteal'].forEach(p => {
+    document.getElementById('ph-' + p[0] + (p==='menstrual'?'m':p==='follicular'?'f':p==='ovulation'?'o':'l')).classList.remove('current');
+  });
+  const phaseMap = {menstrual:'ph-m',follicular:'ph-f',ovulation:'ph-o',luteal:'ph-l'};
+  document.getElementById(phaseMap[phase]).classList.add('current');
+
+  // Update bar chart — highlight current
+  const barMap = {menstrual:'bar-m',follicular:'bar-f',ovulation:'bar-o',luteal:'bar-l'};
+  Object.keys(barMap).forEach(p => {
+    const bar = document.getElementById(barMap[p]);
+    bar.classList.toggle('current-bar', p === phase);
+  });
+
+  // Update correlation insight
+  const info = PHASE_INFO[phase];
+  const burnoutScore = parseInt(localStorage.getItem('ka_burnoutScore') || '9');
+  const lvlTxt = burnoutScore <= 5 ? 'low' : burnoutScore <= 10 ? 'moderate' : 'high';
+  document.getElementById('phaseInsights').innerHTML = `
+    <div class="correlation-card ${info.type}">
+      <div class="correlation-ico">${phase==='menstrual'?'🔴':phase==='follicular'?'🌱':phase==='ovulation'?'⭕':'🌙'}</div>
+      <div class="correlation-body">
+        <h4>${info.name} Phase (${info.range}) · Your burnout is ${lvlTxt}</h4>
+        <p>${info.burnout}</p>
+      </div>
+    </div>
+    <div class="correlation-card info" style="margin-top:10px">
+      <div class="correlation-ico">💡</div>
+      <div class="correlation-body">
+        <h4>Evidence-based tip for this phase</h4>
+        <p>${info.tip}</p>
+      </div>
+    </div>`;
+
+  // Save to localStorage
+  localStorage.setItem('ka_cycle', JSON.stringify({ lastPeriod: dateVal, cycleLen, phase, dayOfCycle, daysToNext }));
+  showToast('🌙', 'Cycle data saved locally');
+}
+
+function selCat(el, cat) {
+  document.querySelectorAll('.icat').forEach(i => i.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCat = cat;
+}
+
+function submitIncident() {
+  if (!selectedCat) { showToast('⚠️', 'Please select a category'); return; }
+  const dept = document.getElementById('incDept').value;
+  // In production: POST to /api/incident with only {category, dept} — no userId, no text if blank
+  const token = localStorage.getItem('ka_token');
+  const text = document.getElementById('incText').value.trim();
+  fetch('/api/incident', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ category: selectedCat, dept: dept || null, text: text || null })
+  }).catch(() => {});
+  document.getElementById('incidentForm').style.display = 'none';
+  document.getElementById('successMsg').classList.add('show');
+}
+
+function showToast(ico, txt) {
+  document.getElementById('toastIco').textContent = ico;
+  document.getElementById('toastTxt').textContent = txt;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+// ── INIT ──────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // If Women-Safe Mode was off, auto-enable it when this page is accessed directly
+  if (localStorage.getItem('ka_womenMode') !== 'true') {
+    localStorage.setItem('ka_womenMode', 'true');
+  }
+  const aid = localStorage.getItem('ka_anonId') || 'anon-??????';
+  document.getElementById('anonId').textContent = aid;
+
+  // Restore saved cycle data
+  const saved = localStorage.getItem('ka_cycle');
+  if (saved) {
+    try {
+      const d = JSON.parse(saved);
+      document.getElementById('lastPeriod').value = d.lastPeriod;
+      document.getElementById('cycleLen').value = d.cycleLen;
+      calcCycle();
+    } catch(e) {}
+  }
+});
+</script>
+</body>
+</html>

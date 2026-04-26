@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join Karmic AI</title>
+<link rel="stylesheet" href="css/theme.css">
+<style>
+  body { min-height: 100vh; display: flex; flex-direction: column; }
+  .auth-wrap {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: calc(100vh - 60px);
+  }
+  .auth-left {
+    background: var(--teal);
+    color: white;
+    padding: 60px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .auth-left h2 { font-size: 30px; font-weight: 800; margin-bottom: 12px; }
+  .auth-left p { opacity: 0.85; font-size: 16px; margin-bottom: 32px; }
+  .feature-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .feature-list li { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+  .feature-list li::before { content: '✓'; background: rgba(255,255,255,0.2); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+
+  .auth-right {
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 32px;
+  }
+  .auth-box { width: 100%; max-width: 400px; }
+  .auth-tabs {
+    display: flex;
+    background: var(--white);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+  }
+  .auth-tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--rose);
+    transition: all 0.15s;
+  }
+  .auth-tab.active { background: var(--teal); color: white; }
+
+  .auth-form { display: none; }
+  .auth-form.active { display: block; }
+
+  .role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .role-option {
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .role-option:hover { border-color: var(--teal); }
+  .role-option.selected { border-color: var(--teal); background: var(--teal-light); }
+  .role-option input { display: none; }
+  .role-option .role-icon { font-size: 22px; margin-bottom: 4px; }
+  .role-option .role-name { font-size: 12px; font-weight: 700; }
+  .role-option .role-desc { font-size: 11px; color: var(--rose); }
+
+  .gender-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .gender-opt {
+    flex: 1;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .gender-opt.selected { border-color: var(--berry); background: var(--berry-light); color: var(--berry); }
+
+  .anon-note {
+    background: var(--teal-light);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--teal-dark);
+    margin-top: 12px;
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+  }
+  .submit-btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 20px;
+    background: var(--teal);
+    color: white;
+    border-radius: var(--radius-sm);
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .submit-btn:hover { opacity: 0.88; }
+
+  @media(max-width: 768px) {
+    .auth-wrap { grid-template-columns: 1fr; }
+    .auth-left { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand"><a href="index.html" style="color:inherit;text-decoration:none">Karmic <span style="color:var(--berry)">AI</span></a></div>
+  <div class="nav-links">
+    <a href="index.html">← Back to Home</a>
+  </div>
+</nav>
+
+<div class="auth-wrap">
+  <div class="auth-left">
+    <h2>You are not alone.</h2>
+    <p>Thousands of doctors in India are quietly struggling. Karmic AI gives you a safe space — anonymous, private, and built for your reality.</p>
+    <ul class="feature-list">
+      <li>Fully anonymous — your hospital cannot identify you</li>
+      <li>Role-based dashboard built for your stage of career</li>
+      <li>Peer rooms with doctors who understand your shift</li>
+      <li>Women-Safe Mode with one toggle</li>
+      <li>AI burnout prediction — 2–3 weeks ahead</li>
+    </ul>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-box">
+        <a href="admin-login.html" style="display:flex;align-items:center;gap:10px;background:#F5EAF0;border:1.5px solid #6D2E46;border-radius:10px;padding:12px 16px;margin-bottom:20px;text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='#E8C5D5'" onmouseout="this.style.background='#F5EAF0'">
+          <span style="font-size:22px">🏥</span>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:700;color:#6D2E46">Hospital Admin? Click here</div>
+            <div style="font-size:11px;color:#A26769">Access the anonymised hospital wellness dashboard</div>
+          </div>
+          <span style="color:#6D2E46;font-weight:700;font-size:14px">→</span>
+        </a>
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-signup" onclick="switchTab('signup')">Create Account</div>
+        <div class="auth-tab" id="tab-login" onclick="switchTab('login')">Log In</div>
+      </div>
+
+      <!-- SIGNUP FORM -->
+      <div class="auth-form active" id="form-signup">
+        <div class="form-group">
+          <label>Email (used only for login — never shown)</label>
+          <input type="email" id="email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Min 8 characters" required>
+        </div>
+        <div class="form-group">
+          <label>Institution / Hospital</label>
+          <input type="text" id="institution" placeholder="e.g. AIIMS Delhi, KEM Mumbai">
+        </div>
+        <div class="form-group">
+          <label>Your Role</label>
+          <div class="role-grid">
+            <label class="role-option" id="role-intern">
+              <input type="radio" name="role" value="INTERN">
+              <div class="role-icon">🎓</div>
+              <div class="role-name">Intern</div>
+              <div class="role-desc">MBBS final year / house job</div>
+            </label>
+            <label class="role-option" id="role-junior">
+              <input type="radio" name="role" value="JUNIOR_RESIDENT">
+              <div class="role-icon">🩺</div>
+              <div class="role-name">Junior Resident</div>
+              <div class="role-desc">PG year 1–2</div>
+            </label>
+            <label class="role-option" id="role-senior">
+              <input type="radio" name="role" value="SENIOR_RESIDENT">
+              <div class="role-icon">👨‍⚕️</div>
+              <div class="role-name">Senior Resident</div>
+              <div class="role-desc">PG year 3 / fellow</div>
+            </label>
+            <label class="role-option" id="role-consultant">
+              <input type="radio" name="role" value="CONSULTANT">
+              <div class="role-icon">🏥</div>
+              <div class="role-name">Consultant</div>
+              <div class="role-desc">Attending / faculty</div>
+            </label>
+          </div>
+          <!-- Admin toggle -->
+          <div id="adminToggleWrap" style="margin-top:10px;padding:10px 14px;background:#F5EAF0;border-radius:8px;border:1.5px dashed #6D2E46;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleAdminMode()">
+            <span style="font-size:20px">🔐</span>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700;color:#6D2E46">I am a Hospital Admin</div>
+              <div style="font-size:11px;color:#A26769">Access the hospital-level anonymised dashboard</div>
+            </div>
+            <div id="adminCheck" style="width:20px;height:20px;border-radius:50%;border:2px solid #6D2E46;display:flex;align-items:center;justify-content:center;font-size:12px;color:#6D2E46"></div>
+          </div>
+        </div>
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <select id="department">
+            <option value="">Select department</option>
+            <option>Emergency Medicine</option>
+            <option>Intensive Care (ICU)</option>
+            <option>Cardiology</option>
+            <option>Surgery</option>
+            <option>Obstetrics & Gynaecology</option>
+            <option>Paediatrics</option>
+            <option>Internal Medicine</option>
+            <option>Psychiatry</option>
+            <option>Radiology</option>
+            <option>Oncology</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Gender (optional — for personalized support)</label>
+          <div class="gender-row">
+            <div class="gender-opt" onclick="selectGender(this,'FEMALE')">Woman</div>
+            <div class="gender-opt" onclick="selectGender(this,'MALE')">Man</div>
+            <div class="gender-opt" onclick="selectGender(this,'NON_BINARY')">Non-binary</div>
+            <div class="gender-opt" onclick="selectGender(this,'PREFER_NOT')">Prefer not to say</div>
+          </div>
+        </div>
+        <div class="anon-note">🔒 Your email is hashed before storage. We generate an anonymous ID for all interactions. Your hospital admin cannot see your individual data.</div>
+        <button class="submit-btn" onclick="handleSignup()">Create My Account →</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div class="auth-form" id="form-login">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" placeholder="Your password">
+        </div>
+        <button class="submit-btn" onclick="handleLogin()">Log In →</button>
+        <p style="text-align:center;margin-top:14px;font-size:13px;color:var(--rose)">Forgot password? <a href="#">Reset via email</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('login') === 'true') switchTab('login');
+
+  function switchTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('form-' + tab).classList.add('active');
+  }
+
+  document.querySelectorAll('.role-option input').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.role-option').forEach(o => o.classList.remove('selected'));
+      radio.parentElement.classList.add('selected');
+    });
+  });
+
+  let selectedGender = '';
+  function selectGender(el, val) {
+    document.querySelectorAll('.gender-opt').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedGender = val;
+  }
+
+  let isAdminMode = false;
+  let isAdminLoginMode = false;
+
+  function toggleAdminMode() {
+    isAdminMode = !isAdminMode;
+    const chk = document.getElementById('adminCheck');
+    const wrap = document.getElementById('adminToggleWrap');
+    chk.textContent = isAdminMode ? '✓' : '';
+    wrap.style.background = isAdminMode ? '#E8C5D5' : '#F5EAF0';
+    // Deselect other role options when admin is selected
+    if (isAdminMode) {
+      document.querySelectorAll('.role-option').forEach(o => o.classList.remove('selected'));
+    }
+  }
+
+  function toggleAdminLogin() {
+    isAdminLoginMode = !isAdminLoginMode;
+    const chk = document.getElementById('adminLoginCheck');
+    const wrap = document.getElementById('adminLoginToggle');
+    chk.textContent = isAdminLoginMode ? '✓' : '';
+    wrap.style.background = isAdminLoginMode ? '#E8C5D5' : '#F5EAF0';
+  }
+
+  function handleSignup() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const role = isAdminMode ? 'ADMIN' : document.querySelector('.role-option.selected input')?.value;
+    const institution = document.getElementById('institution').value;
+    const department = document.getElementById('department').value;
+
+    if (!email || !password || !role) {
+      alert('Please fill in email, password, and select a role.');
+      return;
+    }
+
+    const payload = { email, password, role, institution, department, gender: selectedGender };
+
+    fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.token) {
+        localStorage.setItem('ka_token', data.token);
+        localStorage.setItem('ka_role', data.role);
+        localStorage.setItem('ka_gender', data.gender || '');
+        window.location.href = 'dashboard.html';
+      } else {
+        alert(data.message || 'Signup failed. Please try again.');
+      }
+    })
+    .catch(() => {
+      // Demo mode — redirect anyway
+      localStorage.setItem('ka_token', 'demo');
+      localStorage.setItem('ka_role', role);
+      localStorage.setItem('ka_gender', selectedGender);
+      window.location.href = 'dashboard.html';
+    });
+  }
+
+  function handleLogin() {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.token) {
+        localStorage.setItem('ka_token', data.token);
+        localStorage.setItem('ka_role', data.role);
+        localStorage.setItem('ka_gender', data.gender || '');
+        window.location.href = data.role === 'ADMIN' ? 'admin.html' : 'dashboard.html';
+      } else {
+        alert(data.message || 'Login failed.');
+      }
+    })
+    .catch(() => {
+      // Demo mode — use admin toggle to decide
+      localStorage.setItem('ka_token', 'demo');
+      const role = isAdminLoginMode ? 'ADMIN' : 'JUNIOR_RESIDENT';
+      localStorage.setItem('ka_role', role);
+      window.location.href = isAdminLoginMode ? 'admin.html' : 'dashboard.html';
+    });
+  }
+</script>
+</body>
+</html>

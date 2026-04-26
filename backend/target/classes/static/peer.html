@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peer Support — Karmic AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/peer-admin.css">
+<style>
+/* ── ACTIVITY INDICATORS ───────────────────── */
+.live-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+  display: inline-block;
+  flex-shrink: 0;
+  animation: pulse 2.5s infinite;
+}
+.live-dot.busy { background: var(--warn); }
+.live-dot.quiet { background: var(--rose); animation: none; }
+@keyframes pulse {
+  0%,100%{transform:scale(1);opacity:1}
+  50%{transform:scale(1.5);opacity:0.6}
+}
+
+.room-activity-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.room-activity-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 1s ease;
+}
+.room-activity-fill.active  { background: var(--ok); }
+.room-activity-fill.moderate { background: var(--warn); }
+.room-activity-fill.quiet   { background: var(--rose); }
+
+/* ── ROOM ITEM ENHANCED ────────────────────── */
+.room-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+  border-left: 3px solid transparent;
+}
+.room-item:hover { background: var(--teal-light); }
+.room-item.active { background: var(--teal-light); border-left-color: var(--teal); }
+.room-icon-wrap {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.room-item.active .room-icon-wrap { background: white; }
+.room-meta { flex: 1; min-width: 0; }
+.room-meta h4 { font-size: 13px; font-weight: 600; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.room-meta .room-preview { font-size: 11px; color: var(--rose); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.room-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+.room-count {
+  background: var(--teal);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  min-width: 22px;
+  text-align: center;
+}
+.room-count.busy { background: var(--warn); }
+.room-count.quiet { background: var(--rose); }
+.room-time { font-size: 10px; color: var(--rose); }
+
+/* ── TYPING INDICATOR ──────────────────────── */
+.typing-indicator {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  color: var(--rose);
+}
+.typing-indicator.visible { display: flex; }
+.typing-dots { display: flex; gap: 3px; }
+.typing-dots span {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--rose);
+  animation: typingBounce 1.2s infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)} }
+
+/* ── ONLINE COUNTER HEADER ─────────────────── */
+.chat-header {
+  padding: 14px 20px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.chat-header .room-icon-lg {
+  width: 44px; height: 44px;
+  background: var(--teal-light);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.chat-header-body { flex: 1; }
+.chat-header-body h2 { font-size: 16px; font-weight: 700; }
+.chat-header-body p { font-size: 12px; color: var(--rose); margin-top: 2px; }
+.online-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--teal-light);
+  color: var(--teal-dark);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ── SYSTEM MESSAGES ───────────────────────── */
+.msg-system {
+  text-align: center;
+  font-size: 12px;
+  color: var(--rose);
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.msg-system::before, .msg-system::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── REACTION BAR ──────────────────────────── */
+.msg-reactions {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+.reaction-btn {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.reaction-btn:hover, .reaction-btn.active { background: var(--teal-light); border-color: var(--teal); }
+
+/* ── SIDEBAR HEADER ────────────────────────── */
+.peer-sidebar-header { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.peer-sidebar-header h2 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+.peer-sidebar-meta { display: flex; align-items: center; justify-content: space-between; }
+
+/* ── SEARCH ────────────────────────────────── */
+.room-search {
+  width: 100%;
+  padding: 8px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: var(--font);
+  background: var(--cream);
+  outline: none;
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.room-search:focus { border-color: var(--teal); background: white; }
+
+/* ── FILTER TABS ───────────────────────────── */
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 12px 10px;
+  overflow-x: auto;
+}
+.filter-tab {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--cream);
+  color: var(--charcoal);
+  border: none;
+  transition: all 0.15s;
+}
+.filter-tab.active { background: var(--teal); color: white; }
+
+/* ── EMPTY CHAT STATE ──────────────────────── */
+.chat-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--rose);
+  background: var(--cream);
+}
+.chat-empty-icon { font-size: 48px; margin-bottom: 16px; }
+.chat-empty h3 { font-size: 16px; font-weight: 700; color: var(--charcoal); margin-bottom: 8px; }
+.chat-empty p { font-size: 13px; line-height: 1.6; max-width: 280px; }
+
+/* ── PRIV BANNER ───────────────────────────── */
+.peer-priv {
+  background: var(--charcoal);
+  color: rgba(255,255,255,0.6);
+  font-size: 12px;
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.peer-priv strong { color: rgba(255,255,255,0.9); }
+
+/* ── ANON TOGGLE WRAP ──────────────────────── */
+.anon-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--rose);
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">Karmic <span style="color:var(--berry)">AI</span></div>
+  <div class="nav-links">
+    <a href="dashboard.html">← Dashboard</a>
+    <a href="peer.html" class="active">Peer Rooms</a>
+    <a href="#" onclick="logout()">Log Out</a>
+  </div>
+</nav>
+
+<div class="peer-priv">
+  <span>🔒 You appear as <strong id="anonLabel">anon-••••••</strong></span>
+  <span>💬 Messages <strong>ephemeral · 24h max</strong></span>
+  <span>🚫 No names, no logs, <strong>ever</strong></span>
+</div>
+
+<div class="peer-layout">
+
+  <!-- Room Sidebar -->
+  <div class="peer-sidebar">
+    <div class="peer-sidebar-header">
+      <h2>💬 Peer Rooms</h2>
+      <div class="peer-sidebar-meta">
+        <div class="anon-row">
+          <span>Anonymous</span>
+          <div class="toggle on" id="anonToggle" onclick="toggleAnon()"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ok)">
+          <div class="live-dot"></div>
+          <span id="totalOnline">89 online</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div style="padding:10px 12px 0">
+      <input class="room-search" placeholder="Search rooms…" oninput="searchRooms(this.value)">
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs" id="filterTabs">
+      <button class="filter-tab active" onclick="filterRooms('all',this)">All</button>
+      <button class="filter-tab" onclick="filterRooms('emergency',this)">Emergency</button>
+      <button class="filter-tab" onclick="filterRooms('specialty',this)">Specialty</button>
+      <button class="filter-tab" id="womenTab" onclick="filterRooms('women',this)" style="display:none">👩 Women</button>
+    </div>
+
+    <div class="rooms-list" id="roomsList"></div>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="chat-area">
+
+    <!-- Chat Header -->
+    <div class="chat-header" id="chatHeader">
+      <div class="room-icon-lg" id="chatIcon">💬</div>
+      <div class="chat-header-body">
+        <h2 id="chatRoomName">Select a room</h2>
+        <p id="chatRoomDesc">Choose a peer room to connect anonymously</p>
+      </div>
+      <div class="online-pill" id="onlinePill" style="display:none">
+        <div class="live-dot"></div>
+        <span id="onlineCount">0</span> online
+      </div>
+    </div>
+
+    <!-- Typing indicator -->
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+      <span id="typingText">Someone is typing…</span>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages" id="messagesArea">
+      <div class="chat-empty">
+        <div class="chat-empty-icon">💬</div>
+        <h3>You are not alone.</h3>
+        <p>Select a room on the left to connect with peers who understand exactly what you're going through.</p>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <textarea class="chat-input" id="msgInput" placeholder="Share what's on your mind… (Enter to send, Shift+Enter for new line)" rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+        oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';handleTyping()"></textarea>
+      <button class="btn-primary" onclick="sendMessage()" style="flex-shrink:0;height:40px">Send</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── ROOM DATA ─────────────────────────────────────────────────────────
+const ROOMS = [
+  { id:'icu',        name:'ICU / Critical Care',    icon:'🫀', desc:'High-pressure care, moral distress',        cat:'specialty', online:12, activity:72, lastMsg:'2 min ago' },
+  { id:'nightshift', name:'Night Shift Survivors',  icon:'🌙', desc:'Fatigue, isolation, post-call blues',       cat:'emergency', online:8,  activity:45, lastMsg:'5 min ago' },
+  { id:'emergency',  name:'Emergency Medicine',     icon:'🚑', desc:'Trauma, high-volume, burnout',             cat:'emergency', online:15, activity:88, lastMsg:'just now' },
+  { id:'exams',      name:'PG Exam Pressure',       icon:'📚', desc:'NEET-PG, DNB, Diplomat stress',            cat:'specialty', online:22, activity:95, lastMsg:'just now' },
+  { id:'women',      name:'Women Doctors Only',     icon:'👩‍⚕️', desc:'Safe space — gender-specific challenges', cat:'women',     online:6,  activity:60, lastMsg:'8 min ago' },
+  { id:'harassment', name:'Workplace Concerns',     icon:'🛡️', desc:'Anonymous space for reporting & support', cat:'emergency', online:4,  activity:25, lastMsg:'12 min ago' },
+  { id:'firstyear',  name:'First Year Interns',     icon:'🎓', desc:'New to clinical life, finding your feet', cat:'specialty', online:18, activity:82, lastMsg:'1 min ago' },
+  { id:'surgery',    name:'Surgical Residents',     icon:'🔬', desc:'OR stress, hierarchy, long hours',        cat:'specialty', online:9,  activity:55, lastMsg:'4 min ago' },
+  { id:'general',    name:'General Wellbeing',      icon:'💚', desc:'Open chat — anything goes',               cat:'all',       online:31, activity:90, lastMsg:'just now' },
+];
+
+const SEED_MSGS = {
+  icu:[
+    {from:'anon-K7PR',text:'Had a rough night. Lost two patients in 6 hours. Feel numb.',time:'11:42 PM',own:false,reactions:{heart:3,hug:2}},
+    {from:'anon-M2QX',text:'That kind of shift stays with you. Are you okay? Genuinely asking.',time:'11:44 PM',own:false,reactions:{}},
+    {from:'anon-K7PR',text:'Not really. But talking helps. Thank you.',time:'11:46 PM',own:false,reactions:{heart:4}},
+  ],
+  nightshift:[
+    {from:'anon-T9LW',text:"Day 4 of nights. Can't remember what sunlight feels like.",time:'3:15 AM',own:false,reactions:{heart:5}},
+    {from:'anon-B5NE',text:"Same. My off day starts in 2 hours and I'm too wired to sleep.",time:'3:18 AM',own:false,reactions:{}},
+    {from:'anon-P3KX',text:'Night shift solidarity 🌙 You are not alone at 3am.',time:'3:20 AM',own:false,reactions:{heart:7,hug:3}},
+  ],
+  exams:[
+    {from:'anon-R2QA',text:'NEET-PG in 3 weeks. I literally cannot remember why I wanted to be a doctor.',time:'9:02 PM',own:false,reactions:{hug:5}},
+    {from:'anon-S8LV',text:'I felt the same thing last year. I passed. You will too. What subject is hardest right now?',time:'9:05 PM',own:false,reactions:{heart:4}},
+  ],
+  general:[
+    {from:'anon-A1XX',text:'Good evening everyone. How is everyone holding up?',time:'8:00 PM',own:false,reactions:{}},
+    {from:'anon-C4PR',text:'Managing. Had a surprisingly good consult today. Small wins.',time:'8:05 PM',own:false,reactions:{heart:2}},
+    {from:'anon-D9TZ',text:'ICU was brutal this week but this room helps. Thank you all.',time:'8:12 PM',own:false,reactions:{heart:6,hug:3}},
+  ],
+  women:[
+    {from:'anon-F2MK',text:'Does anyone else feel like they have to work twice as hard to be taken half as seriously?',time:'7:30 PM',own:false,reactions:{heart:9,hug:4}},
+    {from:'anon-G5NB',text:'Every. Single. Day. Especially in surgery. You are not imagining it.',time:'7:32 PM',own:false,reactions:{heart:11}},
+  ],
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let currentRoom = null;
+let isAnon = true;
+let activeFilter = 'all';
+let searchQuery = '';
+let msgs = {};
+let typingTimer = null;
+let fakeTypingTimer = null;
+
+// ── INIT ──────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const anonId = localStorage.getItem('ka_anonId') || ('anon-' + Math.random().toString(36).slice(2,8).toUpperCase());
+  localStorage.setItem('ka_anonId', anonId);
+  document.getElementById('anonLabel').textContent = anonId;
+
+  if (localStorage.getItem('ka_womenMode') === 'true') {
+    document.getElementById('womenTab').style.display = 'block';
+  }
+
+  renderRooms();
+
+  // Auto-join most relevant room
+  const womenMode = localStorage.getItem('ka_womenMode') === 'true';
+  joinRoom(womenMode ? 'women' : 'general');
+
+  // Simulate online count fluctuation
+  setInterval(fluctuateOnline, 8000);
+});
+
+// ── RENDER ROOMS ──────────────────────────────────────────────────────
+function renderRooms() {
+  const womenMode = localStorage.getItem('ka_womenMode') === 'true';
+  const list = document.getElementById('roomsList');
+
+  const filtered = ROOMS.filter(r => {
+    if (r.cat === 'women' && !womenMode) return false;
+    if (activeFilter !== 'all' && r.cat !== activeFilter && r.cat !== 'all') return false;
+    if (searchQuery && !r.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
+
+  list.innerHTML = filtered.map(r => {
+    const actLevel = r.activity > 70 ? 'active' : r.activity > 40 ? 'moderate' : 'quiet';
+    const dotLevel = r.activity > 70 ? '' : r.activity > 40 ? 'busy' : 'quiet';
+    const countClass = r.online > 15 ? '' : r.online > 8 ? 'busy' : 'quiet';
+    return `
+    <div class="room-item ${currentRoom === r.id ? 'active' : ''}" onclick="joinRoom('${r.id}')">
+      <div class="room-icon-wrap">${r.icon}</div>
+      <div class="room-meta">
+        <h4>${r.name}</h4>
+        <div class="room-preview">${r.desc}</div>
+        <div class="room-activity-bar">
+          <div class="room-activity-fill ${actLevel}" style="width:${r.activity}%"></div>
+        </div>
+      </div>
+      <div class="room-right">
+        <span class="room-count ${countClass}">
+          <span style="display:inline-flex;align-items:center;gap:3px"><div class="live-dot ${dotLevel}" style="width:5px;height:5px;margin:0"></div>${r.online}</span>
+        </span>
+        <span class="room-time">${r.lastMsg}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Total online
+  const total = ROOMS.reduce((s,r)=>s+r.online,0);
+  document.getElementById('totalOnline').textContent = total + ' online';
+}
+
+function filterRooms(cat, el) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderRooms();
+}
+
+function searchRooms(q) {
+  searchQuery = q;
+  renderRooms();
+}
+
+// ── JOIN ROOM ─────────────────────────────────────────────────────────
+function joinRoom(id) {
+  currentRoom = id;
+  const room = ROOMS.find(r => r.id === id);
+  if (!room) return;
+
+  document.getElementById('chatIcon').textContent = room.icon;
+  document.getElementById('chatRoomName').textContent = room.name;
+  document.getElementById('chatRoomDesc').textContent = room.desc;
+
+  const onlinePill = document.getElementById('onlinePill');
+  onlinePill.style.display = 'flex';
+  document.getElementById('onlineCount').textContent = room.online;
+
+  renderRooms(); // re-render to update active state
+
+  if (!msgs[id]) msgs[id] = [...(SEED_MSGS[id] || [{from:'anon-SYS',text:`Welcome to ${room.name}. This is a safe, anonymous space.`,time:'System',own:false,reactions:{}}])];
+  renderMsgs(id);
+
+  // Add join system message
+  addSystemMsg(`You joined ${room.name}`);
+
+  // Simulate fake typing occasionally
+  scheduleFakeTyping();
+
+  const token = localStorage.getItem('ka_token');
+  fetch(`/api/peer/rooms/${id}/join`, {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + token }
+  }).catch(() => {});
+}
+
+// ── RENDER MESSAGES ───────────────────────────────────────────────────
+function renderMsgs(roomId) {
+  const area = document.getElementById('messagesArea');
+  const m = msgs[roomId] || [];
+
+  area.innerHTML = m.map(msg => {
+    if (msg.isSystem) {
+      return `<div class="msg-system">${msg.text}</div>`;
+    }
+    const initials = msg.own ? 'ME' : msg.from.slice(-2).toUpperCase();
+    const reactHtml = msg.reactions && Object.keys(msg.reactions).length
+      ? `<div class="msg-reactions">${Object.entries(msg.reactions).map(([e,c])=>
+          `<span class="reaction-btn" onclick="reactMsg(this)">${e==='heart'?'❤️':e==='hug'?'🤗':'👍'} ${c}</span>`
+        ).join('')}</div>` : '';
+    return `
+      <div class="msg-wrap ${msg.own ? 'own' : ''}">
+        <div class="msg-avatar" style="${msg.own?'background:var(--teal);color:white':''}">${initials}</div>
+        <div>
+          <div class="msg-bubble">${msg.text}</div>
+          <div class="msg-time">${isAnon ? (msg.own ? 'You (anonymous)' : msg.from) : msg.from} · ${msg.time}</div>
+          ${reactHtml}
+        </div>
+      </div>`;
+  }).join('');
+
+  area.scrollTop = area.scrollHeight;
+}
+
+function addSystemMsg(text) {
+  if (!currentRoom || !msgs[currentRoom]) return;
+  msgs[currentRoom].push({ isSystem: true, text });
+  renderMsgs(currentRoom);
+}
+
+function reactMsg(btn) {
+  btn.classList.toggle('active');
+  const parts = btn.textContent.trim().split(' ');
+  const count = parseInt(parts[1] || '0');
+  const emoji = parts[0];
+  btn.textContent = emoji + ' ' + (btn.classList.contains('active') ? count + 1 : count - 1);
+}
+
+// ── SEND MESSAGE ──────────────────────────────────────────────────────
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || !currentRoom) return;
+
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  msgs[currentRoom].push({ from: 'You', text, time, own: true, reactions: {} });
+  renderMsgs(currentRoom);
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Simulate a peer response sometimes
+  if (Math.random() > 0.4) schedulePeerReply();
+
+  const token = localStorage.getItem('ka_token');
+  fetch(`/api/peer/rooms/${currentRoom}/message`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ text, anonymous: isAnon })
+  }).catch(() => {});
+}
+
+// ── FAKE TYPING / LIVELINESS ──────────────────────────────────────────
+function handleTyping() {
+  // No-op for real — just shows intent
+}
+
+function scheduleFakeTyping() {
+  clearTimeout(fakeTypingTimer);
+  const delay = 3000 + Math.random() * 8000;
+  fakeTypingTimer = setTimeout(() => {
+    showTyping();
+  }, delay);
+}
+
+function showTyping() {
+  if (!currentRoom) return;
+  const room = ROOMS.find(r => r.id === currentRoom);
+  const names = ['anon-K7PR', 'anon-M2QX', 'anon-T9LW', 'anon-B5NE', 'anon-P3KX'];
+  const name = names[Math.floor(Math.random() * names.length)];
+  document.getElementById('typingText').textContent = `${name} is typing…`;
+  document.getElementById('typingIndicator').classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('typingIndicator').classList.remove('visible');
+  }, 2500);
+}
+
+function schedulePeerReply() {
+  const replies = {
+    icu: ["I understand exactly what you mean.", "That's so common in the ICU. You're not alone.", "Please take care of yourself tonight."],
+    nightshift: ["Night shift solidarity. Hang in there.", "I'm 2 weeks into nights. Same feeling.", "The 4am wall hits everyone."],
+    exams: ["One day at a time. You've got this.", "Which subject? Maybe I can help.", "The exam stress is real. Breathe."],
+    general: ["Thank you for sharing that.", "We're all in this together.", "That took courage to say. ❤️"],
+    women: ["Yes. Absolutely yes.", "The double burden is real and exhausting.", "You're seen. You're not alone."],
+    default: ["That resonates with me.", "Thank you for sharing.", "I've felt that too."]
+  };
+
+  const pool = replies[currentRoom] || replies.default;
+  const text = pool[Math.floor(Math.random() * pool.length)];
+  const names = ['anon-K7PR', 'anon-M2QX', 'anon-T9LW', 'anon-B5NE', 'anon-P3KX', 'anon-S8LV'];
+  const from = names[Math.floor(Math.random() * names.length)];
+
+  setTimeout(() => {
+    showTyping();
+    setTimeout(() => {
+      document.getElementById('typingIndicator').classList.remove('visible');
+      if (currentRoom && msgs[currentRoom]) {
+        const now = new Date();
+        const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+        msgs[currentRoom].push({ from, text, time, own: false, reactions: {} });
+        renderMsgs(currentRoom);
+      }
+    }, 2500);
+  }, 1500 + Math.random() * 2000);
+}
+
+function fluctuateOnline() {
+  ROOMS.forEach(r => {
+    const delta = Math.floor(Math.random() * 3) - 1;
+    r.online = Math.max(1, r.online + delta);
+    r.activity = Math.min(100, Math.max(10, r.activity + (Math.random() * 10 - 5)));
+  });
+  renderRooms();
+  if (currentRoom) {
+    const room = ROOMS.find(r => r.id === currentRoom);
+    if (room) document.getElementById('onlineCount').textContent = room.online;
+  }
+}
+
+// ── TOGGLE ANON ───────────────────────────────────────────────────────
+function toggleAnon() {
+  isAnon = !isAnon;
+  document.getElementById('anonToggle').classList.toggle('on', isAnon);
+  if (currentRoom) renderMsgs(currentRoom);
+  const token = localStorage.getItem('ka_token');
+  fetch('/api/peer/anonymous', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ anonymous: isAnon })
+  }).catch(() => {});
+}
+
+function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+</script>
+</body>
+</html>

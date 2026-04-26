@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Karmic AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<style>
+:root{
+  --teal:#028090;--teal-d:#01606E;--teal-l:#E1F5EE;
+  --berry:#6D2E46;--berry-l:#F5EAF0;
+  --cream:#F5F0E8;--rose:#A26769;--charcoal:#2C2C2C;
+  --white:#fff;--border:#E0DBD0;--shadow:0 2px 12px rgba(0,0,0,.07);
+  --ok:#27AE60;--warn:#E67E22;--danger:#C0392B;--r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--cream);color:var(--charcoal);font-size:15px;line-height:1.6}
+.eng-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.eng-label{font-size:13px;color:var(--charcoal);flex:1}
+.eng-bar-wrap{width:160px;height:10px;background:var(--cream);border-radius:5px;overflow:hidden}
+.eng-bar-fill{height:100%;border-radius:5px;background:var(--teal)}
+.eng-pct{font-size:13px;font-weight:700;color:var(--teal);width:40px;text-align:right}
+.role-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.role-name{font-size:13px;width:130px;flex-shrink:0}
+.role-bar-wrap{flex:1;height:10px;background:var(--cream);border-radius:5px;overflow:hidden}
+.role-bar-fill{height:100%;border-radius:5px}
+.role-score{font-size:12px;font-weight:700;width:44px;text-align:right}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,var(--charcoal),#1A2A3A)}
+.login-card{background:#fff;border-radius:20px;padding:40px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.login-brand{font-family:'DM Serif Display',serif;font-size:24px;color:var(--teal);margin-bottom:6px}
+.login-brand span{color:var(--berry)}
+.login-sub{font-size:13px;color:var(--rose);margin-bottom:28px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+.fg label{font-size:12px;font-weight:600;color:var(--rose)}
+.fg input{padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .15s}
+.fg input:focus{border-color:var(--teal)}
+.btn-login{width:100%;padding:13px;background:var(--teal-d);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:opacity .15s}
+.btn-login:hover{opacity:.88}
+.login-note{font-size:12px;color:var(--rose);text-align:center;margin-top:14px;padding:10px;background:var(--teal-l);border-radius:8px}
+
+/* NAV */
+.nav{background:var(--teal-d);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.nav-brand{font-family:'DM Serif Display',serif;font-size:20px;color:#fff}
+.nav-brand span{color:#B2E0E4}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-pill{background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600}
+.nav-links a{padding:7px 14px;border-radius:8px;color:rgba(255,255,255,.75);font-size:14px;font-weight:500;text-decoration:none;transition:background .15s}
+.nav-links a:hover{background:rgba(255,255,255,.12);color:#fff}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+.sidebar{background:#01505C;padding:20px 14px;display:flex;flex-direction:column;gap:4px}
+.slink{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,.7);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s;text-decoration:none}
+.slink:hover,.slink.active{background:rgba(255,255,255,.12);color:#fff}
+.slink .ico{font-size:17px;width:22px}
+.sdivider{height:1px;background:rgba(255,255,255,.1);margin:10px 0}
+
+/* MAIN */
+.main{padding:28px 32px;overflow-y:auto}
+.page-header{margin-bottom:24px}
+.page-header h1{font-size:22px;font-weight:700;color:var(--charcoal)}
+.page-header p{font-size:13px;color:var(--rose);margin-top:2px}
+
+/* PRIVACY NOTE */
+.priv-note{background:var(--teal-l);border-radius:var(--r);padding:12px 18px;font-size:13px;color:var(--teal-d);margin-bottom:24px;display:flex;gap:10px;align-items:flex-start;line-height:1.55}
+
+/* METRIC CARDS */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.metric-card{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--shadow);border-top:3px solid var(--teal)}
+.metric-card.ok{border-top-color:var(--ok)}
+.metric-card.warn{border-top-color:var(--warn)}
+.metric-card.danger{border-top-color:var(--danger)}
+.metric-card.teal{border-top-color:var(--teal)}
+.metric-num{font-family:'DM Serif Display',serif;font-size:38px;color:var(--charcoal);line-height:1;margin-bottom:4px}
+.metric-lbl{font-size:12px;color:var(--rose)}
+.metric-delta{font-size:11px;font-weight:600;margin-top:6px;display:inline-block;padding:2px 8px;border-radius:10px}
+.delta-up{background:#FDECEA;color:var(--danger)}
+.delta-dn{background:#EAF7EE;color:var(--ok)}
+.delta-eq{background:var(--cream);color:var(--rose)}
+
+/* RISK ALERTS */
+.risk-alerts{margin-bottom:24px}
+.alert-card{display:flex;align-items:flex-start;gap:14px;padding:14px 18px;border-radius:12px;border-left:4px solid;margin-bottom:10px}
+.alert-card.crit{background:#FDECEA;border-left-color:var(--danger)}
+.alert-card.high{background:#FEF0E6;border-left-color:var(--warn)}
+.alert-card.mod{background:#FEF9E7;border-left-color:#F0D000}
+.alert-ico{font-size:22px;flex-shrink:0}
+.alert-body h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.alert-body p{font-size:12.5px;color:#555;line-height:1.5}
+.alert-action{margin-left:auto;flex-shrink:0;padding:6px 14px;border-radius:8px;border:none;font-size:12px;font-weight:600;cursor:pointer;background:rgba(0,0,0,.07);color:var(--charcoal);transition:background .15s}
+.alert-action:hover{background:rgba(0,0,0,.14)}
+
+/* DEPT CHART */
+.dept-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.dept-row{background:#fff;border-radius:10px;padding:14px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:16px}
+.dept-name{font-size:13px;font-weight:600;width:160px;flex-shrink:0}
+.dept-bar-wrap{flex:1;height:16px;background:var(--cream);border-radius:8px;overflow:hidden;position:relative}
+.dept-bar-fill{height:100%;border-radius:8px;transition:width .8s ease}
+.dept-bar-fill.low{background:var(--ok)}
+.dept-bar-fill.moderate{background:var(--warn)}
+.dept-bar-fill.high{background:#E67E22}
+.dept-bar-fill.critical{background:var(--danger)}
+.dept-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;width:100px}
+.dept-lvl{font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px}
+.dept-lvl.low{background:#EAF7EE;color:#1A7A3F}
+.dept-lvl.moderate{background:#FEF3E2;color:#964B00}
+.dept-lvl.high{background:#FEF0E6;color:#A04000}
+.dept-lvl.critical{background:#FDECEA;color:var(--danger)}
+.dept-avg{font-size:11px;color:var(--rose)}
+
+/* 7-DAY TREND CHART */
+.trend-canvas-wrap{background:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--shadow);margin-bottom:24px}
+.trend-canvas-wrap h3{font-size:15px;font-weight:700;margin-bottom:16px}
+#trendCanvas{width:100%;height:120px;display:block}
+
+/* SPLIT GRID */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+
+/* DONUT-STYLE PIE */
+.donut-wrap{background:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--shadow)}
+.donut-wrap h3{font-size:15px;font-weight:700;margin-bottom:16px}
+.donut-chart{display:flex;align-items:center;gap:24px}
+.donut-svg{flex-shrink:0}
+.donut-legend{display:flex;flex-direction:column;gap:10px;flex:1}
+.dleg-item{display:flex;align-items:center;gap:10px;font-size:13px}
+.dleg-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.dleg-pct{font-weight:700;margin-left:auto}
+
+/* ENGAGEMENT */
+.eng-card{background:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--shadow)}
+.eng-card h3{font-size:15px;font-weight:700;margin-bottom:16px}
+.eng-row{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.eng-label{font-size:13px;color:var(--charcoal);flex:1}
+.eng-bar-wrap{width:160px;height:10px;background:var(--cream);border-radius:5px;overflow:hidden}
+.eng-bar-fill{height:100%;border-radius:5px;background:var(--teal)}
+.eng-pct{font-size:13px;font-weight:700;color:var(--teal);width:40px;text-align:right}
+
+/* ROLE BREAKDOWN */
+.role-card{background:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--shadow)}
+.role-card h3{font-size:15px;font-weight:700;margin-bottom:16px}
+.role-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.role-name{font-size:13px;width:130px;flex-shrink:0}
+.role-bar-wrap{flex:1;height:10px;background:var(--cream);border-radius:5px;overflow:hidden}
+.role-bar-fill{height:100%;border-radius:5px}
+.role-score{font-size:12px;font-weight:700;width:44px;text-align:right}
+
+/* 7D SELECTOR */
+.period-tabs{display:flex;gap:6px;margin-bottom:16px}
+.ptab{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;background:var(--cream);border:none;color:var(--charcoal);transition:all .15s}
+.ptab.active{background:var(--teal);color:#fff}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .metrics-row{grid-template-columns:1fr 1fr}
+  .split{grid-template-columns:1fr}
+  .main{padding:16px}
+}
+@media(max-width:500px){
+  .metrics-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginWrap" class="login-wrap">
+  <div class="login-card">
+    <div class="login-brand">Karmic <span>AI</span></div>
+    <div class="login-sub">Hospital Administrator Login</div>
+    <div id="loginErr" style="display:none;background:#FDECEA;color:#C0392B;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px"></div>
+    <div class="fg"><label>Hospital Name</label><input type="text" id="adminHosp" placeholder="e.g. AIIMS Delhi, KEM Mumbai"></div>
+    <div class="fg"><label>Hospital Code <span style="color:#A26769;font-weight:400">(set during registration)</span></label><input type="text" id="adminCode" placeholder="e.g. AIIMS-DL-2024" style="letter-spacing:.05em"></div>
+    <div class="fg"><label>Admin Email</label><input type="email" id="adminEmail" placeholder="admin@hospital.org"></div>
+    <div class="fg"><label>Password</label><input type="password" id="adminPass" placeholder="Admin password"></div>
+    <button class="btn-login" onclick="adminLogin()">Access Dashboard →</button>
+    <div class="login-note">🔒 Data is scoped to your hospital only. All figures are <strong>aggregated, anonymised</strong> — no individual records accessible.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashWrap" style="display:none">
+
+<nav class="nav">
+  <div class="nav-brand">Karmic <span>AI</span></div>
+  <div class="nav-right">
+    <span class="nav-pill" id="navHospPill">Admin View</span>
+    <div class="nav-links">
+      <a href="#" onclick="adminLogout()">Log Out</a>
+    </div>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div style="color:rgba(255,255,255,.35);font-size:11px;padding:0 8px 14px;font-weight:700;letter-spacing:.06em">ADMIN PANEL</div>
+    <a class="slink active" href="#"><span class="ico">📊</span>Overview</a>
+    <a class="slink" href="#depts"><span class="ico">🏥</span>Departments</a>
+    <a class="slink" href="#alerts"><span class="ico">🚨</span>Risk Alerts</a>
+    <a class="slink" href="#engagement"><span class="ico">📈</span>Engagement</a>
+    <div class="sdivider"></div>
+    <a class="slink" href="#trend"><span class="ico">📉</span>7-Day Trend</a>
+    <a class="slink" href="#roles"><span class="ico">👥</span>By Role</a>
+    <a class="slink" id="womenSideLink" href="#women" style="display:none"><span class="ico">👩‍⚕️</span>Women Data</a>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <h1 id="instName">Hospital Wellness Overview</h1>
+      <p id="weekLabel">Loading…</p>
+    </div>
+
+    <div class="priv-note">
+      🔒 <strong>Privacy guarantee:</strong> All data shown is department-level aggregate. No individual doctor scores, names, or check-in responses are accessible. Minimum 5 responses required before any department data is shown.
+    </div>
+
+    <!-- GRAPHS FIRST: 7-DAY TREND -->
+    <div class="trend-canvas-wrap" id="trend" style="margin-bottom:24px">
+      <h3>📉 7-Day Burnout Trend — <span id="trendHospName">Institution</span></h3>
+      <div class="period-tabs">
+        <button class="ptab active" onclick="drawTrend(7,this)">7 Days</button>
+        <button class="ptab" onclick="drawTrend(14,this)">14 Days</button>
+        <button class="ptab" onclick="drawTrend(30,this)">30 Days</button>
+      </div>
+      <canvas id="trendCanvas"></canvas>
+      <p style="font-size:11px;color:var(--rose);margin-top:8px">Institution-wide averages. No individual data shown.</p>
+    </div>
+
+    <!-- DEPT BREAKDOWN CHART -->
+    <div style="margin-bottom:24px" id="depts">
+      <div style="font-size:16px;font-weight:700;margin-bottom:14px">🏥 Burnout by Department</div>
+      <div class="dept-grid" id="deptGrid"></div>
+    </div>
+
+    <!-- OVERVIEW METRICS (below charts) -->
+    <div class="metrics-row" id="metricsRow">
+      <div class="metric-card ok">
+        <div class="metric-num" id="mActive">847</div>
+        <div class="metric-lbl">Active users this week</div>
+        <span class="metric-delta delta-dn">↑ 12% vs last week</span>
+      </div>
+      <div class="metric-card warn">
+        <div class="metric-num" id="mAvg">9.4</div>
+        <div class="metric-lbl">Avg burnout score / 20</div>
+        <span class="metric-delta delta-up">↑ 0.8 this week</span>
+      </div>
+      <div class="metric-card danger">
+        <div class="metric-num" id="mHighRisk">3</div>
+        <div class="metric-lbl">Depts at elevated risk</div>
+        <span class="metric-delta delta-eq">→ Same as last week</span>
+      </div>
+      <div class="metric-card teal">
+        <div class="metric-num" id="mCheckin">68%</div>
+        <div class="metric-lbl">Check-in completion rate</div>
+        <span class="metric-delta delta-dn">↑ 5% vs last week</span>
+      </div>
+    </div>
+
+    <!-- RISK ALERTS -->
+    <div id="alerts" style="margin-bottom:24px">
+      <div style="font-size:16px;font-weight:700;margin-bottom:14px">🚨 Risk Alerts</div>
+      <div class="risk-alerts" id="riskAlerts"></div>
+    </div>
+
+    <div class="priv-note" style="margin-top:8px">
+      📋 <strong>You can see:</strong> dept averages, role trends, weekly change, engagement rates. &nbsp;|&nbsp; <strong>You cannot see:</strong> individual check-in answers, personal scores, names, or any identifiable records.
+    </div>
+
+    <!-- ENGAGEMENT + ROLE BREAKDOWN -->
+    <div class="split" id="engagement">
+      <div class="eng-card">
+        <h3>📈 Engagement Metrics</h3>
+        <div id="engRows"></div>
+        <p style="font-size:12px;color:var(--rose);margin-top:12px;line-height:1.5">Higher check-in rates = better data accuracy and more timely escalation.</p>
+      </div>
+      <div class="role-card" id="roles">
+        <h3>👥 Burnout Score by Role</h3>
+        <div id="roleRows"></div>
+        <p style="font-size:12px;color:var(--rose);margin-top:12px;line-height:1.5">Role-level averages only. Individual scores never accessible.</p>
+      </div>
+    </div>
+
+    <!-- BURNOUT DISTRIBUTION -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:16px;font-weight:700;margin-bottom:14px">📊 Burnout Distribution</div>
+      <div class="donut-wrap">
+        <h3 style="font-size:13px;color:var(--rose);font-weight:500;margin-bottom:16px">% of active users per burnout level</h3>
+        <div class="donut-chart">
+          <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120" id="donutSvg">
+            <circle cx="60" cy="60" r="48" fill="none" stroke="#EAF7EE" stroke-width="18"/>
+          </svg>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WOMEN DATA SECTION — only shown if womenEnabled -->
+    <div id="women" style="display:none">
+      <div style="font-size:16px;font-weight:700;margin-bottom:14px">👩‍⚕️ Women Doctor Wellbeing Data</div>
+      <div class="priv-note" style="background:var(--berry-l);color:var(--berry);border-left:3px solid var(--berry)">
+        🔒 This section is visible because Women-Safe Mode is enabled at your institution. All data is aggregate only — no individual identity is ever accessible. Minimum 5 respondents required.
+      </div>
+      <div class="split" style="margin-top:16px">
+        <div class="eng-card">
+          <h3>👩 Women-Safe Mode Adoption</h3>
+          <div style="margin-bottom:10px">
+            <div class="eng-row"><div class="eng-label">Women-Safe Mode enabled</div><div class="eng-bar-wrap"><div class="eng-bar-fill" style="width:62%;background:var(--berry)"></div></div><div class="eng-pct" style="color:var(--berry)">62%</div></div>
+            <div class="eng-row"><div class="eng-label">Women-only rooms used</div><div class="eng-bar-wrap"><div class="eng-bar-fill" style="width:41%;background:var(--berry)"></div></div><div class="eng-pct" style="color:var(--berry)">41%</div></div>
+            <div class="eng-row"><div class="eng-label">Incident reports submitted</div><div class="eng-bar-wrap"><div class="eng-bar-fill" style="width:18%;background:#C0392B"></div></div><div class="eng-pct" style="color:#C0392B">18%</div></div>
+          </div>
+          <p style="font-size:12px;color:var(--rose)">Incident figures represent anonymous category counts only. No text or identity data is stored.</p>
+        </div>
+        <div class="role-card">
+          <h3>📋 Incident Categories (Anonymous)</h3>
+          <div id="incidentRows">
+            <div class="role-row"><div class="role-name" style="width:150px">Workplace bias</div><div class="role-bar-wrap"><div class="role-bar-fill" style="width:45%;background:#E67E22"></div></div><div class="role-score" style="color:#E67E22;width:30px">9</div></div>
+            <div class="role-row"><div class="role-name" style="width:150px">Harassment</div><div class="role-bar-wrap"><div class="role-bar-fill" style="width:30%;background:#C0392B"></div></div><div class="role-score" style="color:#C0392B;width:30px">6</div></div>
+            <div class="role-row"><div class="role-name" style="width:150px">Safety concern</div><div class="role-bar-wrap"><div class="role-bar-fill" style="width:20%;background:#E67E22"></div></div><div class="role-score" style="color:#E67E22;width:30px">4</div></div>
+            <div class="role-row"><div class="role-name" style="width:150px">Unfair workload</div><div class="role-bar-wrap"><div class="role-bar-fill" style="width:35%;background:#E67E22"></div></div><div class="role-score" style="color:#E67E22;width:30px">7</div></div>
+          </div>
+          <p style="font-size:12px;color:var(--rose);margin-top:12px">Counts only. No report text, no submitter data stored.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+</div>
+
+<script>
+// ── MOCK DATA ─────────────────────────────────────────────────────────
+const DEPTS = [
+  {name:'Emergency Medicine', level:'critical', avg:14.2, pct:71, delta:'+1.8'},
+  {name:'ICU / Critical Care', level:'critical', avg:12.6, pct:63, delta:'+0.9'},
+  {name:'Surgery',             level:'high',     avg:11.9, pct:60, delta:'+1.1'},
+  {name:'Obstetrics & Gynae',  level:'moderate', avg:9.4,  pct:47, delta:'-0.3'},
+  {name:'Internal Medicine',   level:'moderate', avg:8.7,  pct:44, delta:'-0.8'},
+  {name:'Paediatrics',         level:'moderate', avg:7.9,  pct:40, delta:'+0.2'},
+  {name:'Radiology',           level:'low',      avg:5.2,  pct:26, delta:'-1.4'},
+  {name:'Psychiatry',          level:'low',      avg:4.8,  pct:24, delta:'-0.6'},
+];
+
+const ALERTS = [
+  {type:'crit', ico:'🔴', dept:'Emergency Medicine', msg:'65% of active doctors at HIGH or CRITICAL burnout. 3+ consecutive high-risk days detected across multiple anonymous users.'},
+  {type:'crit', ico:'🔴', dept:'ICU / Critical Care', msg:'Average burnout score 12.6/20. Worsening trend (+0.9 this week). Peer support room usage up 40% — a possible coping signal.'},
+  {type:'high', ico:'🟠', dept:'Surgery', msg:'Burnout rising week-on-week for 3 weeks. Consider reviewing on-call rosters and workload distribution.'},
+];
+
+const DIST = [
+  {label:'Low (0–5)',      pct:22, color:var_ok()},
+  {label:'Moderate (6–10)',pct:41, color:var_warn()},
+  {label:'High (11–15)',   pct:28, color:'#E67E22'},
+  {label:'Critical (16+)', pct:9,  color:'#C0392B'},
+];
+
+const ENGAGEMENT = [
+  {label:'Daily check-in rate',   pct:68},
+  {label:'Peer room participation',pct:34},
+  {label:'Support tool usage',    pct:52},
+  {label:'Women-Safe Mode active',pct:47},
+];
+
+const ROLES = [
+  {name:'Junior Resident', score:13.8, level:'critical', color:'#C0392B'},
+  {name:'Intern',          score:12.4, level:'high',     color:'#E67E22'},
+  {name:'Senior Resident', score:11.2, level:'high',     color:'#E67E22'},
+  {name:'Consultant',      score:7.6,  level:'moderate', color:'#E67E22'},
+];
+
+const TREND_7  = [8.2,9.1,10.3,9.8,10.1,8.7,9.4];
+const TREND_14 = [7.5,8.0,8.2,9.1,10.3,9.8,10.1,8.7,9.4,9.8,10.2,9.6,9.1,9.4];
+const TREND_30 = Array.from({length:30},(_,i)=>7+Math.sin(i/3)*2+Math.random()*1.5);
+const TREND_LABELS_7 = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+function var_ok(){return '#27AE60'} function var_warn(){return '#E67E22'}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────
+function adminLogin() {
+  const hosp  = document.getElementById('adminHosp').value.trim();
+  const code  = document.getElementById('adminCode').value.trim();
+  const email = document.getElementById('adminEmail').value.trim();
+  const pass  = document.getElementById('adminPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.style.display = 'none';
+
+  if (!hosp || !code || !email || !pass) {
+    errEl.textContent = 'Please fill in all fields — hospital name, code, email, and password.';
+    errEl.style.display = 'block'; return;
+  }
+  if (code.length < 6) {
+    errEl.textContent = 'Hospital code must be at least 6 characters.';
+    errEl.style.display = 'block'; return;
+  }
+
+  fetch('/api/auth/login', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({email, password:pass, hospitalCode:code, institution:hosp})
+  }).then(r=>r.json()).then(d=>{
+    if (d.token && d.role === 'ADMIN') {
+      localStorage.setItem('ka_admin_token', d.token);
+      localStorage.setItem('ka_admin_hosp', hosp);
+      localStorage.setItem('ka_admin_code', code);
+      localStorage.setItem('ka_admin_womenEnabled', d.womenEnabled || 'false');
+      showDashboard(hosp, d.womenEnabled);
+    } else {
+      errEl.textContent = d.message || 'Access denied. Check your hospital code and credentials.';
+      errEl.style.display = 'block';
+    }
+  }).catch(()=>{
+    // Demo mode — code must contain 'DEMO' or be 6+ chars
+    localStorage.setItem('ka_admin_token','demo-admin');
+    localStorage.setItem('ka_admin_hosp', hosp);
+    localStorage.setItem('ka_admin_code', code);
+    const womenEnabled = code.toUpperCase().includes('W') || Math.random() > 0.5;
+    localStorage.setItem('ka_admin_womenEnabled', womenEnabled);
+    showDashboard(hosp, womenEnabled);
+  });
+}
+
+function showDashboard(hosp, womenEnabled) {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('dashWrap').style.display = 'block';
+  loadDashboard(hosp, womenEnabled);
+}
+
+function adminLogout() {
+  ['ka_admin_token','ka_admin_hosp','ka_admin_code','ka_admin_womenEnabled'].forEach(k=>localStorage.removeItem(k));
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('dashWrap').style.display = 'none';
+}
+
+// ── LOAD DASHBOARD ────────────────────────────────────────────────────
+function loadDashboard(hosp, womenEnabled) {
+  hosp = hosp || localStorage.getItem('ka_admin_hosp') || 'Your Institution';
+  womenEnabled = womenEnabled ?? (localStorage.getItem('ka_admin_womenEnabled') === 'true');
+  const now = new Date();
+
+  document.getElementById('instName').textContent = hosp + ' — Wellness Overview';
+  document.getElementById('weekLabel').textContent = 'Week of ' + now.toLocaleDateString('en-IN',{month:'long',year:'numeric'}) + ' · Aggregated · Anonymised';
+  document.getElementById('trendHospName').textContent = hosp;
+  document.getElementById('navHospPill').textContent = hosp;
+
+  // Women section visibility
+  if (womenEnabled) {
+    document.getElementById('women').style.display = 'block';
+    document.getElementById('womenSideLink').style.display = 'flex';
+  }
+
+  const token = localStorage.getItem('ka_admin_token');
+  fetch('/api/admin/overview', {headers:{'Authorization':'Bearer '+token}})
+    .then(r=>r.json()).then(d=>{
+      if (d.totalActive) document.getElementById('mActive').textContent = d.totalActive;
+      if (d.avgScore)    document.getElementById('mAvg').textContent = d.avgScore.toFixed(1);
+      if (d.highRiskDepts) document.getElementById('mHighRisk').textContent = d.highRiskDepts;
+    }).catch(()=>{});
+
+  renderAlerts();
+  renderDepts();
+  renderDonut();
+  renderEngagement();
+  renderRoles();
+  setTimeout(()=>drawTrend(7, document.querySelector('.ptab.active')), 50);
+}
+
+// ── ALERTS ────────────────────────────────────────────────────────────
+function renderAlerts() {
+  document.getElementById('riskAlerts').innerHTML = ALERTS.map(a=>`
+    <div class="alert-card ${a.type}">
+      <div class="alert-ico">${a.ico}</div>
+      <div class="alert-body">
+        <h4>${a.dept}</h4>
+        <p>${a.msg}</p>
+      </div>
+      <button class="alert-action">View dept →</button>
+    </div>`).join('');
+}
+
+// ── DEPTS ─────────────────────────────────────────────────────────────
+function renderDepts() {
+  document.getElementById('deptGrid').innerHTML = DEPTS.map(d=>`
+    <div class="dept-row">
+      <div class="dept-name">${d.name}</div>
+      <div class="dept-bar-wrap">
+        <div class="dept-bar-fill ${d.level}" style="width:${d.pct}%"></div>
+      </div>
+      <div class="dept-meta">
+        <span class="dept-lvl ${d.level}">${cap(d.level)}</span>
+        <span class="dept-avg">${d.avg}/20 avg <span style="color:${d.delta.startsWith('+')?'var(--danger)':'var(--ok)'}">${d.delta}</span></span>
+      </div>
+    </div>`).join('');
+}
+
+// ── DONUT ─────────────────────────────────────────────────────────────
+function renderDonut() {
+  const svg = document.getElementById('donutSvg');
+  const r = 48, cx = 60, cy = 60, strokeW = 18;
+  const total = DIST.reduce((s,d)=>s+d.pct,0);
+  let offset = -90; // start at top
+
+  let circles = '';
+  DIST.forEach(d=>{
+    const angle = (d.pct/total)*360;
+    const dashArr = (2*Math.PI*r);
+    const dashFill = (d.pct/100)*dashArr;
+    circles += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="${strokeW}"
+      stroke-dasharray="${dashFill} ${dashArr-dashFill}"
+      stroke-dashoffset="${-(offset/360)*dashArr}"
+      transform="rotate(${offset} ${cx} ${cy})"/>`;
+    offset += angle;
+  });
+
+  // Centre text
+  circles += `<text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="18" font-weight="700" font-family="DM Sans" fill="#2C2C2C">9.4</text>`;
+  circles += `<text x="${cx}" y="${cy+14}" text-anchor="middle" font-size="10" font-family="DM Sans" fill="#A26769">avg/20</text>`;
+  svg.innerHTML = circles;
+
+  document.getElementById('donutLegend').innerHTML = DIST.map(d=>`
+    <div class="dleg-item">
+      <div class="dleg-dot" style="background:${d.color}"></div>
+      <span>${d.label}</span>
+      <span class="dleg-pct">${d.pct}%</span>
+    </div>`).join('');
+}
+
+// ── ENGAGEMENT ────────────────────────────────────────────────────────
+function renderEngagement() {
+  document.getElementById('engRows').innerHTML = ENGAGEMENT.map(e=>`
+    <div class="eng-row">
+      <div class="eng-label">${e.label}</div>
+      <div class="eng-bar-wrap"><div class="eng-bar-fill" style="width:${e.pct}%"></div></div>
+      <div class="eng-pct">${e.pct}%</div>
+    </div>`).join('');
+}
+
+// ── ROLES ─────────────────────────────────────────────────────────────
+function renderRoles() {
+  document.getElementById('roleRows').innerHTML = ROLES.map(r=>`
+    <div class="role-row">
+      <div class="role-name">${r.name}</div>
+      <div class="role-bar-wrap"><div class="role-bar-fill" style="width:${(r.score/20*100).toFixed(0)}%;background:${r.color}"></div></div>
+      <div class="role-score" style="color:${r.color}">${r.score}</div>
+    </div>`).join('');
+}
+
+// ── TREND CHART ───────────────────────────────────────────────────────
+function drawTrend(days, el) {
+  if (el) { document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active')); el.classList.add('active'); }
+  const data = days===7?TREND_7:days===14?TREND_14:TREND_30;
+  const labels = days===7?TREND_LABELS_7:data.map((_,i)=>`D${i+1}`);
+
+  const canvas = document.getElementById('trendCanvas');
+  const dpr = window.devicePixelRatio||1;
+  canvas.width = canvas.offsetWidth * dpr;
+  canvas.height = 120 * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  const W = canvas.offsetWidth, H = 120;
+  const padL=30,padB=22,padT=10,padR=10;
+  const cW=W-padL-padR, cH=H-padB-padT;
+  const max=20,min=0;
+  const step=cW/(data.length-1);
+
+  ctx.clearRect(0,0,W,H);
+
+  // Grid lines
+  [5,10,15,20].forEach(v=>{
+    const y=padT+cH-(v/max)*cH;
+    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);
+    ctx.strokeStyle='rgba(0,0,0,.06)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='#A26769';ctx.font=`10px DM Sans`;ctx.textAlign='right';
+    ctx.fillText(v,padL-4,y+3);
+  });
+
+  // Gradient fill
+  const grad=ctx.createLinearGradient(0,padT,0,H-padB);
+  grad.addColorStop(0,'rgba(2,128,144,.2)');
+  grad.addColorStop(1,'rgba(2,128,144,0)');
+
+  // Line
+  ctx.beginPath();
+  data.forEach((v,i)=>{
+    const x=padL+i*step;
+    const y=padT+cH-(((v-min)/(max-min))*cH);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='#028090';ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+
+  // Fill
+  ctx.lineTo(padL+(data.length-1)*step,H-padB);
+  ctx.lineTo(padL,H-padB);ctx.closePath();
+  ctx.fillStyle=grad;ctx.fill();
+
+  // Dots + labels
+  data.forEach((v,i)=>{
+    const x=padL+i*step;
+    const y=padT+cH-(((v-min)/(max-min))*cH);
+    ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);
+    ctx.fillStyle=v>12?'#E74C3C':v>9?'#E67E22':'#028090';ctx.fill();
+    ctx.fillStyle='#A26769';ctx.font=`9px DM Sans`;ctx.textAlign='center';
+    if(days<=14) ctx.fillText(labels[i],x,H-6);
+  });
+}
+
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  // Auto-login if coming from admin-login.html
+  const role = localStorage.getItem('ka_role');
+  const token = localStorage.getItem('ka_token');
+  const inst = localStorage.getItem('ka_institution');
+  if((role==='ADMIN' && token) || localStorage.getItem('ka_admin_token')){
+    const hosp = inst || localStorage.getItem('ka_admin_hosp') || 'Your Institution';
+    localStorage.setItem('ka_admin_token', token || 'demo');
+    localStorage.setItem('ka_admin_hosp', hosp);
+    showDashboard(hosp, false);
+  }
+  window.addEventListener('resize',()=>{
+    if(document.getElementById('dashWrap').style.display!=='none')
+      drawTrend(7, document.querySelector('.ptab.active'));
+  });
+});
+</script>
+</body>
+</html>

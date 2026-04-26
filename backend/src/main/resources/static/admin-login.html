@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Admin Login — Karmic AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#0D1F2D;color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+
+.back-link{position:fixed;top:20px;left:24px;color:rgba(255,255,255,0.4);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:6px;transition:color 0.15s}
+.back-link:hover{color:rgba(255,255,255,0.8)}
+
+.box{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:40px;width:100%;max-width:420px}
+
+.brand{font-family:'DM Serif Display',serif;font-size:22px;color:#A8EBF0;text-align:center;margin-bottom:6px}
+.brand span{color:#D98BAB}
+.tagline{text-align:center;font-size:13px;color:rgba(255,255,255,0.35);margin-bottom:32px}
+
+.admin-badge{display:flex;align-items:center;gap:10px;background:rgba(109,46,70,0.2);border:1px solid rgba(109,46,70,0.4);border-radius:10px;padding:12px 16px;margin-bottom:28px}
+.admin-badge .ico{font-size:24px}
+.admin-badge h3{font-size:14px;font-weight:700;color:#D98BAB;margin-bottom:2px}
+.admin-badge p{font-size:12px;color:rgba(255,255,255,0.35)}
+
+.label{font-size:12px;font-weight:600;color:rgba(255,255,255,0.4);margin-bottom:7px;display:block;letter-spacing:0.04em}
+.inp{width:100%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 16px;font-size:15px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;transition:border-color 0.15s;margin-bottom:16px}
+.inp:focus{border-color:#028090}
+.inp::placeholder{color:rgba(255,255,255,0.2)}
+
+.btn{width:100%;background:#6D2E46;color:#fff;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity 0.15s;margin-top:4px;font-family:'DM Sans',sans-serif}
+.btn:hover{opacity:0.88}
+
+.demo-note{background:rgba(2,128,144,0.1);border:1px solid rgba(2,128,144,0.25);border-radius:10px;padding:12px 16px;font-size:12.5px;color:rgba(255,255,255,0.45);margin-top:18px;line-height:1.6}
+.demo-note strong{color:#A8EBF0}
+
+.error{background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#F1948A;margin-top:12px;display:none}
+.error.show{display:block}
+</style>
+</head>
+<body>
+
+<a href="index.html" class="back-link">← Back to Home</a>
+
+<div class="box">
+  <div class="brand">Karmic <span>AI</span></div>
+  <div class="tagline">Hospital Administration Portal</div>
+
+  <div class="admin-badge">
+    <div class="ico">🏥</div>
+    <div>
+      <h3>Admin Access</h3>
+      <p>View anonymised department-level wellness data</p>
+    </div>
+  </div>
+
+  <div>
+    <label class="label">HOSPITAL / INSTITUTION NAME</label>
+    <input class="inp" type="text" id="institution" placeholder="e.g. AIIMS Delhi, Apollo Mumbai">
+
+    <label class="label">ADMIN EMAIL</label>
+    <input class="inp" type="email" id="email" placeholder="admin@hospital.in">
+
+    <label class="label">PASSWORD</label>
+    <input class="inp" type="password" id="password" placeholder="Enter your admin password" onkeydown="if(event.key==='Enter')login()">
+
+    <button class="btn" onclick="login()">Access Admin Dashboard →</button>
+
+    <div class="demo-note">
+      🔒 <strong>Demo mode:</strong> Enter any institution name, email and password (min 4 chars) to preview the admin dashboard. No real credentials required for demo.
+    </div>
+    <div class="error" id="errBox">Please fill in all fields to continue.</div>
+  </div>
+</div>
+
+<script>
+function login(){
+  const inst = document.getElementById('institution').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const pass = document.getElementById('password').value.trim();
+  const err = document.getElementById('errBox');
+
+  if(!inst || !email || !pass){
+    err.textContent = 'Please fill in all fields to continue.';
+    err.classList.add('show');
+    return;
+  }
+  if(pass.length < 4){
+    err.textContent = 'Password must be at least 4 characters.';
+    err.classList.add('show');
+    return;
+  }
+  err.classList.remove('show');
+
+  // Try real API first
+  fetch('/api/auth/login', {
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({email, password:pass, role:'ADMIN'})
+})
+.then(()=> {
+  // ALWAYS go to demo for now
+  localStorage.setItem('ka_token','demo-admin');
+  localStorage.setItem('ka_role','ADMIN');
+  localStorage.setItem('ka_institution', inst);
+  window.location.href='admin.html';
+})
+.catch(()=> {
+  // ALSO go to demo
+  localStorage.setItem('ka_token','demo-admin');
+  localStorage.setItem('ka_role','ADMIN');
+  localStorage.setItem('ka_institution', inst);
+  window.location.href='admin.html';
+});
+}
+</script>
+</body>
+</html>

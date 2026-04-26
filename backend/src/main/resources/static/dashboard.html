@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Burnout Radar — Karmic AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/dashboard.css">
+<style>
+/* ── RESULT SCREEN ─────────────────────────── */
+.result-overlay,.checkin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:300;align-items:center;justify-content:center;padding:20px}
+.result-overlay.open,.checkin-overlay.open{display:flex}
+.result-card,.checkin-card{background:white;border-radius:20px;padding:32px;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:slideUp 0.3s ease;max-height:90vh;overflow-y:auto}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+.result-level-badge{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto 16px}
+.result-level-badge.low{background:#EAF7EE}
+.result-level-badge.moderate{background:#FEF3E2}
+.result-level-badge.high{background:#FEF0E6}
+.result-level-badge.critical{background:#FDECEA}
+.result-title{font-family:'DM Serif Display',serif;font-size:24px;text-align:center;margin-bottom:6px}
+.result-sub{text-align:center;font-size:13px;color:var(--rose);margin-bottom:20px}
+.result-chips{display:flex;gap:8px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+.result-chip{padding:6px 14px;border-radius:40px;font-size:12px;font-weight:600;background:var(--cream);color:var(--charcoal)}
+.result-section-title{font-size:11px;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px}
+.result-actions{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.result-action{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1.5px solid var(--border);cursor:pointer;transition:all 0.15s;font-size:14px;font-weight:500;color:var(--charcoal);text-decoration:none}
+.result-action:hover{border-color:var(--teal);background:var(--teal-light);color:var(--teal)}
+.result-action.urgent{border-color:#E74C3C;background:#FEF8F8}
+.result-action.urgent:hover{background:#FDECEA;border-color:#C0392B}
+.result-action-icon{font-size:20px;flex-shrink:0}
+.result-action-text{flex:1}
+.result-action-text small{display:block;font-size:11px;color:var(--rose);font-weight:400;margin-top:1px}
+.result-feedback{padding:12px 16px;background:var(--teal-light);border-radius:10px;font-size:13px;color:var(--teal-dark);display:none;align-items:center;gap:10px;margin-bottom:14px}
+.result-feedback.show{display:flex}
+.result-insight{padding:12px 14px;background:var(--cream);border-radius:10px;font-size:13px;color:var(--charcoal);border-left:3px solid var(--teal);margin-bottom:16px;line-height:1.55}
+.result-close{width:100%;padding:12px;background:var(--cream);border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.15s}
+.result-close:hover{background:var(--border)}
+
+/* ── CHECK-IN MULTI-STEP ───────────────────── */
+.ci-progress{display:flex;gap:6px;margin-bottom:28px}
+.ci-dot{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background 0.3s}
+.ci-dot.done{background:var(--teal)}
+.ci-dot.active{background:#B2DDE2}
+.ci-step{display:none}
+.ci-step.active{display:block;animation:fadeQ 0.25s ease}
+@keyframes fadeQ{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+.ci-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--rose);margin-bottom:8px}
+.ci-question{font-family:'DM Serif Display',serif;font-size:22px;line-height:1.3;margin-bottom:24px;color:var(--charcoal)}
+.scale-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px}
+.scale-opt{border:2px solid var(--border);border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;transition:all 0.15s}
+.scale-opt:hover{border-color:var(--teal)}
+.scale-opt.selected{border-color:var(--teal);background:var(--teal-light)}
+.scale-opt .snum{font-size:22px;font-weight:800;color:var(--charcoal)}
+.scale-opt .slbl{font-size:10px;color:var(--rose);margin-top:3px}
+.slider-val{text-align:center;font-size:44px;font-weight:800;color:var(--teal);margin-bottom:10px}
+.slider-wrap{margin-bottom:24px}
+.slider-wrap input[type=range]{width:100%;accent-color:var(--teal);height:6px;cursor:pointer}
+.slider-lbls{display:flex;justify-content:space-between;font-size:12px;color:var(--rose);margin-top:6px}
+.ci-nav{display:flex;gap:10px;margin-top:4px}
+.ci-back{background:var(--cream);border:none;border-radius:10px;padding:12px 18px;font-weight:600;cursor:pointer;font-size:14px}
+.ci-next{flex:1;background:var(--teal);color:white;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:15px;cursor:pointer;transition:opacity 0.15s}
+.ci-next:hover{opacity:0.88}
+.ci-anon{text-align:center;font-size:12px;color:var(--rose);margin-top:12px}
+
+/* ── DYNAMIC SUPPORT ───────────────────────── */
+.support-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.support-header h3{font-size:16px;font-weight:700}
+.slvl-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+.slvl-badge.low{background:#EAF7EE;color:#1A7A3F}
+.slvl-badge.moderate{background:#FEF3E2;color:#964B00}
+.slvl-badge.high{background:#FEF0E6;color:#A04000}
+.slvl-badge.critical{background:#FDECEA;color:var(--danger)}
+.support-grid-dynamic{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.sac{display:flex;align-items:center;gap:14px;padding:14px 18px;background:white;border:1.5px solid var(--border);border-radius:14px;cursor:pointer;transition:all 0.15s;box-shadow:0 1px 6px rgba(0,0,0,0.04)}
+.sac:hover{border-color:var(--teal);background:var(--teal-light);transform:translateX(3px)}
+.sac.ph{border-left:4px solid var(--danger)}
+.sac.pm{border-left:4px solid var(--warn)}
+.sac.pl{border-left:4px solid var(--ok)}
+.sac-ico{font-size:22px;width:36px;text-align:center;flex-shrink:0}
+.sac-body{flex:1}
+.sac-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.sac-desc{font-size:12px;color:var(--rose)}
+.sac-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:var(--cream);color:var(--rose);white-space:nowrap;flex-shrink:0}
+
+/* ── FEEDBACK TOAST ────────────────────────── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--charcoal);color:white;padding:13px 24px;border-radius:40px;font-size:14px;font-weight:500;z-index:500;transition:transform 0.3s ease;display:flex;align-items:center;gap:10px;white-space:nowrap;box-shadow:0 8px 30px rgba(0,0,0,0.2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── REMINDER ──────────────────────────────── */
+.reminder{background:linear-gradient(135deg,#E8F4F6,#D6EEF2);border:1.5px solid var(--teal-light);border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.reminder .rico{font-size:28px}
+.reminder p{flex:1;font-size:13px;color:var(--teal-dark)}
+.reminder p strong{display:block;font-size:14px;margin-bottom:2px}
+.reminder .rbtn{background:var(--teal);color:white;border:none;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0}
+
+/* ── HIGH RISK ─────────────────────────────── */
+.hralert{display:none;background:linear-gradient(135deg,#FDECEA,#FBEAE8);border:2px solid #E74C3C;border-radius:14px;padding:18px 20px;margin-bottom:20px;gap:14px;align-items:flex-start}
+.hralert.show{display:flex}
+.hralert-ico{font-size:28px;flex-shrink:0}
+.hralert-body strong{display:block;font-size:15px;color:#922B21;margin-bottom:4px}
+.hralert-body p{font-size:13px;color:#7B241C;margin-bottom:12px}
+.hralert-btns{display:flex;flex-wrap:wrap;gap:8px}
+.hab{padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:opacity 0.15s}
+.hab:hover{opacity:0.88}
+.hab.d{background:#E74C3C;color:white}
+.hab.p{background:var(--berry);color:white}
+.hab.c{background:var(--teal);color:white}
+
+/* ── PRIV STRIP ────────────────────────────── */
+.priv-strip{background:var(--charcoal);color:rgba(255,255,255,0.55);font-size:12px;padding:8px 20px;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.priv-strip span{display:flex;align-items:center;gap:5px}
+.priv-strip strong{color:rgba(255,255,255,0.9)}
+
+.mood-card{background:white;border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;border:0.5px solid var(--border);margin-top:24px}
+.mood-insight{margin-top:14px;padding:12px 16px;background:var(--cream);border-radius:var(--radius-sm);font-size:13px;line-height:1.6;color:var(--charcoal);border-left:3px solid var(--teal)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">Karmic <span style="color:var(--berry)">AI</span></div>
+  <div class="nav-links">
+    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="peer.html">Peer Rooms</a>
+    <a href="#" onclick="logout()">Log Out</a>
+  </div>
+</nav>
+
+<div class="priv-strip">
+  <span>🔒 You are <strong id="anonIdDisplay">anon-••••••</strong></span>
+  <span>🏥 Hospital sees <strong>dept averages only</strong></span>
+  <span>🗑️ Raw answers <strong>never stored</strong></span>
+</div>
+
+<div class="dash-layout">
+  <aside class="sidebar">
+    <a class="sidebar-link active" href="dashboard.html"><span class="icon">📡</span> <span>Burnout Radar</span></a>
+    <a class="sidebar-link" href="#" onclick="openCheckin()"><span class="icon">✅</span> <span>Daily Check-In</span></a>
+    <a class="sidebar-link" href="peer.html"><span class="icon">💬</span> <span>Peer Rooms</span></a>
+    <a class="sidebar-link" id="womenSideLink" href="women.html" style="display:none"><span class="icon">👩‍⚕️</span> <span>Women Support</span></a>
+    <a class="sidebar-link" href="#support"><span class="icon">⚡</span> <span>Support</span></a>
+    <div class="sidebar-divider"></div>
+    <div style="padding:6px 14px;font-size:11px;color:var(--rose);font-weight:700;letter-spacing:0.06em;text-transform:uppercase">Settings</div>
+    <div class="sidebar-link" style="cursor:pointer" onclick="toggleWomenMode()">
+      <span class="icon">👩</span><span>Women-Safe Mode</span>
+      <div id="womenToggle" class="toggle" style="margin-left:auto;width:36px;height:20px"></div>
+    </div>
+    <div class="sidebar-bottom">
+      <div style="padding:10px 14px;font-size:11px;color:var(--rose);line-height:1.6">🔒 Zero-knowledge active<br><span style="opacity:0.6">DPDP Act 2023 compliant</span></div>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+
+    <!-- High Risk Alert -->
+    <div class="hralert" id="hralert">
+      <div class="hralert-ico">🚨</div>
+      <div class="hralert-body">
+        <strong>High burnout detected for 3+ days</strong>
+        <p>This is a signal worth taking seriously. You don't have to carry this alone — one step takes 2 minutes.</p>
+        <div class="hralert-btns">
+          <button class="hab d" onclick="callICall()">📞 Call iCall Now</button>
+          <button class="hab p" onclick="location.href='peer.html'">💬 Talk to a Peer</button>
+          <button class="hab c" onclick="window.open('https://icallhelpline.org','_blank')">💻 iCall Chat</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reminder Banner -->
+    <div class="reminder" id="reminderBanner" style="display:none">
+      <div class="rico">🌅</div>
+      <p><strong>Your daily check-in is waiting</strong>60 seconds. Keeps your radar accurate.</p>
+      <button class="rbtn" onclick="openCheckin()">Check In →</button>
+    </div>
+
+    <!-- Women Mode Banner -->
+    <div class="women-safe-banner" id="womenSafeBanner" style="display:none">
+      <span style="font-size:22px">👩‍⚕️</span>
+      <p><strong>Women-Safe Mode on.</strong> Cycle tracker, women-only rooms &amp; incident log are now available.</p>
+      <a href="women.html" style="flex-shrink:0;background:var(--berry);color:white;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;white-space:nowrap;text-decoration:none">Open Women Support →</a>
+      <button class="btn-ghost btn-sm" onclick="toggleWomenMode()" style="flex-shrink:0">Turn off</button>
+    </div>
+
+    <!-- Header -->
+    <div class="dash-header">
+      <div>
+        <h1 id="greeting">Good morning, Doctor.</h1>
+        <p id="greetingSub" style="font-size:13px;color:var(--rose);margin-top:2px">How are you holding up today?</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="role-badge" id="roleBadge">Resident</div>
+        <button class="btn-primary btn-sm" onclick="openCheckin()">+ Check In</button>
+      </div>
+    </div>
+
+    <!-- Radar Card -->
+    <div class="radar-card">
+      <h2>📡 Burnout Radar <span class="tag tag-teal" style="font-size:11px;margin-left:8px" id="lastUpdated">—</span></h2>
+      <div class="radar-grid">
+        <div class="radar-metric">
+          <div class="label">Today's Level</div>
+          <div class="value level-moderate" id="lvlVal">—</div>
+          <div class="sub" id="lvlSub">Complete check-in</div>
+        </div>
+        <div class="radar-metric">
+          <div class="label">7-Day Trend</div>
+          <div class="value" id="trendVal" style="font-size:24px">—</div>
+          <div class="sub" id="trendSub">vs. last week</div>
+        </div>
+        <div class="radar-metric">
+          <div class="label">AI Forecast</div>
+          <div class="value" id="predVal" style="font-size:20px">—</div>
+          <div class="sub" id="predSub">Next 7 days</div>
+        </div>
+      </div>
+      <div class="meter-wrap">
+        <div class="meter-bar"><div class="meter-fill" id="meterFill" style="width:0%"></div></div>
+        <div class="meter-labels"><span>Low (0–5)</span><span>Moderate</span><span>High</span><span>Critical (16–20)</span></div>
+      </div>
+      <p style="font-size:12px;color:var(--rose);margin-top:10px" id="radarNote">Complete today's check-in to update your radar.</p>
+    </div>
+
+    <!-- Dynamic Support -->
+    <div id="support">
+      <div class="support-header">
+        <h3>⚡ Support — Matched to You</h3>
+        <span class="slvl-badge moderate" id="slvlBadge">Moderate</span>
+      </div>
+      <div class="support-grid-dynamic" id="supportGrid"></div>
+    </div>
+
+    <!-- MoodMirror -->
+    <div class="mood-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <h3 style="font-size:15px;font-weight:700">🧠 MoodMirror™</h3>
+        <span class="tag tag-berry" style="font-size:10px">90-Day Pattern</span>
+      </div>
+      <p style="font-size:13px;color:var(--rose);margin-bottom:16px">Your personal burnout pattern. AI finds your triggers — not generic ones.</p>
+      <canvas id="moodChart" height="70" style="width:100%"></canvas>
+      <div class="mood-insight" id="moodInsight">Complete 7+ check-ins to unlock your personal pattern insights.</div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ── CHECK-IN OVERLAY ─────────────────────────────────────── -->
+<div class="checkin-overlay" id="ciOverlay">
+  <div class="checkin-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--rose);letter-spacing:0.06em;text-transform:uppercase">Daily Check-In</div>
+        <div style="font-size:13px;color:var(--charcoal);margin-top:2px" id="ciCounter">Step 1 of 5</div>
+      </div>
+      <button onclick="closeCI()" style="background:var(--cream);border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px;color:var(--charcoal)">✕</button>
+    </div>
+    <div class="ci-progress" id="ciProgress"></div>
+    <div id="ciSteps"></div>
+    <div class="ci-nav">
+      <button class="ci-back" id="ciBack" onclick="prevStep()" style="display:none">← Back</button>
+      <button class="ci-next" id="ciNext" onclick="nextStep()">Continue →</button>
+    </div>
+    <div class="ci-anon">🔒 Anonymous · Answers discarded after scoring · Never stored</div>
+  </div>
+</div>
+
+<!-- ── RESULT OVERLAY ───────────────────────────────────────── -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card">
+    <div class="result-level-badge" id="rBadge">🟡</div>
+    <div class="result-title" id="rTitle">Moderate Burnout</div>
+    <div class="result-sub" id="rSub">Score 9/20 · Stable</div>
+    <div class="result-chips">
+      <div class="result-chip" id="rScore">Score: 9/20</div>
+      <div class="result-chip" id="rTrend">→ Stable</div>
+      <div class="result-chip" id="rForecast">☁️ Steady</div>
+    </div>
+    <div class="result-insight" id="rInsight">Loading insight…</div>
+    <div class="result-section-title" id="rActionsTitle">Recommended for you right now</div>
+    <div class="result-actions" id="rActions"></div>
+    <div class="result-feedback" id="rFeedback"><span>✅</span><span id="rFeedbackText">Good step.</span></div>
+    <button class="result-close" onclick="closeResult()">← Back to Dashboard</button>
+  </div>
+</div>
+
+<!-- ── TOAST ────────────────────────────────────────────────── -->
+<div class="toast" id="toast"><span id="toastIcon">✅</span><span id="toastText">Done</span></div>
+
+<script>
+// ── CONFIG DATA ────────────────────────────────────────────────────────
+const STEPS = [
+  { key:'q1', eyebrow:'Energy & Mood', q:'How are you feeling right now?', type:'scale4', labels:['Fine','Drained','Struggling','Breaking'] },
+  { key:'q2', eyebrow:'Work Pressure', q:'How overwhelmed is your workload today?', type:'scale4', labels:['Manageable','Pressured','Overwhelmed','Collapsing'] },
+  { key:'q6', eyebrow:'Sleep', q:'How many hours did you sleep last night?', type:'slider', min:0, max:12, ll:'0 hrs', rl:'12 hrs' },
+  { key:'q7', eyebrow:'Stress', q:'What is your stress level right now?', type:'slider', min:0, max:10, ll:'None', rl:'Extreme' },
+  { key:'q3', eyebrow:'Outlook', q:'Are you feeling hopeful about tomorrow?', type:'scale4', labels:['Yes!','Somewhat','Barely','Not at all'] },
+];
+
+const SUPPORT = {
+  LOW:[
+    {ico:'🫁',title:'Box Breathing (4 min)',desc:'Maintain your good baseline',tag:'4 min',p:'pl',fn:()=>toast('🫁','Starting box breathing…')},
+    {ico:'📓',title:'3-Line Journal',desc:'Capture today before it fades',tag:'3 min',p:'pl',fn:()=>toast('📓','Opening your journal…')},
+    {ico:'💬',title:'Connect with peers',desc:'Community keeps burnout away',tag:'Peer Room',p:'pl',fn:()=>location.href='peer.html'},
+  ],
+  MODERATE:[
+    {ico:'🫁',title:'Box Breathing Now',desc:'Most effective immediate stress relief',tag:'4 min',p:'pm',fn:()=>toast('🫁','Starting box breathing…')},
+    {ico:'🎧',title:'5-Min Reset Audio',desc:'Evidence-based between-shift reset',tag:'5 min',p:'pm',fn:()=>toast('🎧','Loading reset audio…')},
+    {ico:'💬',title:'Peer Support Room',desc:'Talk to doctors who understand',tag:'Anonymous',p:'pm',fn:()=>location.href='peer.html'},
+    {ico:'📞',title:'Book a Session',desc:'Subsidised psych session — iCall',tag:'Free',p:'pm',fn:()=>window.open('https://icallhelpline.org','_blank')},
+  ],
+  HIGH:[
+    {ico:'💬',title:'Talk to a Peer Doctor Now',desc:'Someone in your exact situation',tag:'Urgent · Anon',p:'ph',fn:()=>location.href='peer.html'},
+    {ico:'📞',title:'iCall Helpline',desc:'9152987821 · Trained counselors · Free',tag:'Call Now',p:'ph',fn:()=>callICall()},
+    {ico:'🫁',title:'Crisis Breathing',desc:'Guided 4-7-8 breathing for high stress',tag:'3 min',p:'pm',fn:()=>toast('🫁','Starting crisis breathing…')},
+    {ico:'💻',title:'iCall Online Chat',desc:'Text a counselor right now',tag:'icallhelpline.org',p:'ph',fn:()=>window.open('https://icallhelpline.org','_blank')},
+  ],
+  CRITICAL:[
+    {ico:'📞',title:'Call iCall — 9152987821',desc:'Please reach out right now. You are not alone.',tag:'⚡ Most Urgent',p:'ph',fn:()=>callICall()},
+    {ico:'💬',title:'Emergency Peer Connect',desc:'Immediate anonymous peer support',tag:'Now',p:'ph',fn:()=>location.href='peer.html'},
+    {ico:'💻',title:'iCall Chat',desc:'Instant text support — trained counselors',tag:'icallhelpline.org',p:'ph',fn:()=>window.open('https://icallhelpline.org','_blank')},
+    {ico:'🏥',title:'Institution EAP',desc:'Employee Assistance Program — confidential',tag:'EAP',p:'ph',fn:()=>toast('🏥','Looking up your EAP details…')},
+  ]
+};
+
+const RESULT_CFG = {
+  LOW:      {emoji:'🟢',cls:'low',      title:"You're doing well today.",     sub:'Low burnout detected. Keep protecting your energy.',     title2:'Keep the momentum going',      insight:'✨ Consistent low scores suggest solid coping habits. Your strategies are working.'},
+  MODERATE: {emoji:'🟡',cls:'moderate', title:'Moderate burnout detected.',    sub:'A few things are weighing on you. Address them now.',    title2:'Recommended for you right now', insight:'💡 Most doctors at moderate burnout benefit from a peer conversation + one breathing reset per shift.'},
+  HIGH:     {emoji:'🟠',cls:'high',     title:'High burnout — please act.',    sub:'This level needs attention today, not tomorrow.',         title2:'Take one of these steps now',   insight:'⚠️ High burnout unaddressed for 2+ days typically worsens. A 5-minute peer conversation can break the cycle.'},
+  CRITICAL: {emoji:'🔴',cls:'critical', title:'Critical — reach out now.',     sub:'This is serious. Please contact support in the next few minutes.', title2:'Take one of these steps immediately', insight:'🚨 You are not alone. Critical burnout is a medical state, not weakness. iCall counselors are trained for healthcare workers.'},
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────
+let step = 0, ans = {}, level = 'MODERATE', lastData = null;
+
+// ── CHECK-IN ──────────────────────────────────────────────────────────
+function openCheckin() {
+  step = 0; ans = {};
+  buildCI();
+  document.getElementById('ciOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCI() {
+  document.getElementById('ciOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function buildCI() {
+  // Progress
+  document.getElementById('ciProgress').innerHTML = STEPS.map((_,i)=>
+    `<div class="ci-dot ${i===0?'active':''}" id="cp${i}"></div>`).join('');
+  // Steps
+  document.getElementById('ciSteps').innerHTML = STEPS.map((s,i)=>{
+    let html='';
+    if(s.type==='scale4'){
+      html=`<div class="scale-grid">${['0','1','2','3'].map((v,j)=>`
+        <div class="scale-opt" onclick="selScale('${s.key}',${v},this)">
+          <div class="snum">${v}</div><div class="slbl">${s.labels[j]}</div>
+        </div>`).join('')}</div>`;
+    } else {
+      const mid=Math.floor((s.min+s.max)/2);
+      ans[s.key]=mid;
+      html=`<div class="slider-val" id="sv${s.key}">${mid}</div>
+        <div class="slider-wrap">
+          <input type="range" min="${s.min}" max="${s.max}" value="${mid}" id="sl${s.key}"
+            oninput="document.getElementById('sv${s.key}').textContent=this.value;ans['${s.key}']=+this.value">
+          <div class="slider-lbls"><span>${s.ll}</span><span>${s.rl}</span></div>
+        </div>`;
+    }
+    return `<div class="ci-step ${i===0?'active':''}" id="cs${i}">
+      <div class="ci-eyebrow">${s.eyebrow}</div>
+      <div class="ci-question">${s.q}</div>${html}</div>`;
+  }).join('');
+  updCINav();
+}
+function selScale(key,val,el){
+  el.parentElement.querySelectorAll('.scale-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  ans[key]=+val;
+}
+function updCINav(){
+  document.getElementById('ciCounter').textContent=`Step ${step+1} of ${STEPS.length}`;
+  document.getElementById('ciBack').style.display=step===0?'none':'block';
+  document.getElementById('ciNext').textContent=step===STEPS.length-1?'Submit →':'Continue →';
+  STEPS.forEach((_,i)=>{
+    const d=document.getElementById(`cp${i}`);
+    if(d) d.className='ci-dot '+(i<step?'done':i===step?'active':'');
+  });
+}
+function nextStep(){
+  if(STEPS[step].type==='scale4' && ans[STEPS[step].key]===undefined) ans[STEPS[step].key]=0;
+  if(step<STEPS.length-1){
+    document.getElementById(`cs${step}`).classList.remove('active');
+    step++;
+    document.getElementById(`cs${step}`).classList.add('active');
+    updCINav();
+  } else { submitCI(); }
+}
+function prevStep(){
+  if(step>0){
+    document.getElementById(`cs${step}`).classList.remove('active');
+    step--;
+    document.getElementById(`cs${step}`).classList.add('active');
+    updCINav();
+  }
+}
+function submitCI(){
+  STEPS.forEach(s=>{ if(ans[s.key]===undefined) ans[s.key]=0; });
+  ans.q4=ans.q1; ans.q5=ans.q2;
+  const token=localStorage.getItem('ka_token');
+  fetch('/api/checkin',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(ans)})
+    .then(r=>r.json()).then(d=>{closeCI();showResult(d);updateRadar(d);})
+    .catch(()=>{
+      const phq=(ans.q1||0)+(ans.q2||0)+(ans.q3||0);
+      const sl=ans.q6<4?4:ans.q6<6?3:ans.q6<7?2:ans.q6<9?1:0;
+      const st=Math.min(4,Math.floor((ans.q7||0)/3));
+      const sc=Math.min(20,phq+sl+st);
+      const lv=sc<=5?'LOW':sc<=10?'MODERATE':sc<=15?'HIGH':'CRITICAL';
+      const d={burnoutLevel:lv,score:sc,trend:'STABLE',prediction:sc>12?'WORSENING':'STABLE',trendValue:0};
+      closeCI();showResult(d);updateRadar(d);
+    });
+  localStorage.setItem('ka_lastCheckin',new Date().toDateString());
+  document.getElementById('reminderBanner').style.display='none';
+}
+
+// ── RESULT ────────────────────────────────────────────────────────────
+function showResult(data){
+  lastData=data;
+  const lv=data.burnoutLevel||'MODERATE';
+  const cfg=RESULT_CFG[lv]||RESULT_CFG.MODERATE;
+  const sup=SUPPORT[lv]||SUPPORT.MODERATE;
+  document.getElementById('rBadge').textContent=cfg.emoji;
+  document.getElementById('rBadge').className=`result-level-badge ${cfg.cls}`;
+  document.getElementById('rTitle').textContent=cfg.title;
+  document.getElementById('rSub').textContent=`Score ${data.score||0}/20 · ${data.trend||'Stable'}`;
+  document.getElementById('rScore').textContent=`Score: ${data.score||0}/20`;
+  document.getElementById('rTrend').textContent={IMPROVING:'📈 Improving',STABLE:'→ Stable',WORSENING:'📉 Worsening'}[data.trend]||'→ Stable';
+  document.getElementById('rForecast').textContent={IMPROVING:'🌤 Improving',STABLE:'☁️ Steady',WORSENING:'⚠️ Risk',CRITICAL_RISK:'🚨 High risk'}[data.prediction]||'☁️ Steady';
+  document.getElementById('rInsight').textContent=cfg.insight;
+  document.getElementById('rActionsTitle').textContent=cfg.title2;
+  document.getElementById('rActions').innerHTML=sup.map((s,i)=>`
+    <div class="result-action ${(lv==='CRITICAL'||lv==='HIGH')?'urgent':''}" onclick="handleResultAction(${i})">
+      <span class="result-action-icon">${s.ico}</span>
+      <span class="result-action-text">${s.title}<small>${s.desc}</small></span>
+      <span style="color:var(--rose);font-size:16px">›</span>
+    </div>`).join('');
+  document.getElementById('rFeedback').classList.remove('show');
+  document.getElementById('resultOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function handleResultAction(i){
+  const lv=lastData?.burnoutLevel||'MODERATE';
+  const sup=SUPPORT[lv]||SUPPORT.MODERATE;
+  if(sup[i]?.fn) sup[i].fn();
+  const msgs={LOW:'Great — keep that habit going.',MODERATE:'Good step. Every action counts.',HIGH:"That's courage. Please follow through.",CRITICAL:"You're doing the right thing."};
+  document.getElementById('rFeedbackText').textContent=msgs[lv];
+  document.getElementById('rFeedback').classList.add('show');
+}
+function closeResult(){
+  document.getElementById('resultOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ── RADAR ─────────────────────────────────────────────────────────────
+function updateRadar(data){
+  level=data.burnoutLevel||'MODERATE';
+  const LV={LOW:{lbl:'Low 🟢',cls:'level-low',pct:18,fill:'low'},MODERATE:{lbl:'Moderate 🟡',cls:'level-moderate',pct:42,fill:'moderate'},HIGH:{lbl:'High 🟠',cls:'level-high',pct:70,fill:'high'},CRITICAL:{lbl:'Critical 🔴',cls:'level-critical',pct:90,fill:'critical'}};
+  const lv=LV[level]||LV.MODERATE;
+  document.getElementById('lvlVal').textContent=lv.lbl;
+  document.getElementById('lvlVal').className='value '+lv.cls;
+  document.getElementById('lvlSub').textContent='Score: '+(data.score??'—')+' / 20';
+  document.getElementById('meterFill').style.width=lv.pct+'%';
+  document.getElementById('meterFill').className='meter-fill '+lv.fill;
+  document.getElementById('lastUpdated').textContent='Just now';
+  const tM={IMPROVING:'📈 Improving',STABLE:'→ Stable',WORSENING:'📉 Worsening'};
+  document.getElementById('trendVal').textContent=tM[data.trend]||'→ Stable';
+  document.getElementById('trendSub').textContent=data.trendValue?(data.trendValue>0?'+':'')+data.trendValue+' pts this week':'vs last week';
+  const pM={IMPROVING:'🌤 Improving',STABLE:'☁️ Steady',WORSENING:'⚠️ Worsening',CRITICAL_RISK:'🚨 High risk'};
+  document.getElementById('predVal').textContent=pM[data.prediction]||'☁️ Steady';
+  document.getElementById('predSub').textContent='AI forecast: next 7 days';
+  document.getElementById('radarNote').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  if(level==='CRITICAL'||level==='HIGH') document.getElementById('hralert').classList.add('show');
+  renderSupport(level);
+  const ins={LOW:'✨ Stable scores suggest solid coping. Your strategies are working.',MODERATE:'💡 Moderate patterns often spike mid-week. Breathing resets between cases are most effective.',HIGH:'⚠️ Scores trending higher. Three consecutive high days triggers an anonymous institution wellness alert.',CRITICAL:'🚨 Critical range for multiple days — a clinical signal. Please reach out to iCall today.'};
+  document.getElementById('moodInsight').textContent=ins[level]||ins.MODERATE;
+}
+
+// ── SUPPORT GRID ──────────────────────────────────────────────────────
+function renderSupport(lv){
+  const sup=SUPPORT[lv]||SUPPORT.MODERATE;
+  const badge=document.getElementById('slvlBadge');
+  badge.textContent={LOW:'Low',MODERATE:'Moderate',HIGH:'High',CRITICAL:'Critical'}[lv]||lv;
+  badge.className='slvl-badge '+lv.toLowerCase();
+  document.getElementById('supportGrid').innerHTML=sup.map((s,i)=>`
+    <div class="sac ${s.p}" onclick="handleSupport(${i})">
+      <div class="sac-ico">${s.ico}</div>
+      <div class="sac-body"><div class="sac-title">${s.title}</div><div class="sac-desc">${s.desc}</div></div>
+      <span class="sac-tag">${s.tag}</span>
+    </div>`).join('');
+}
+function handleSupport(i){
+  const sup=SUPPORT[level]||SUPPORT.MODERATE;
+  if(sup[i]?.fn) sup[i].fn();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────
+function toast(ico,txt){
+  document.getElementById('toastIcon').textContent=ico;
+  document.getElementById('toastText').textContent=txt;
+  const t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── MOOD CHART ────────────────────────────────────────────────────────
+function drawMoodChart(){
+  const c=document.getElementById('moodChart');
+  const ctx=c.getContext('2d');
+  c.width=c.offsetWidth*window.devicePixelRatio;
+  c.height=70*window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio,window.devicePixelRatio);
+  const w=c.offsetWidth,h=70;
+  const pts=[5,6,7,8,8,9,10,9,11,10,9,8,9,10,9,8,7,8,9,8,7,6,5,6,7,8,9,8];
+  const step=w/(pts.length-1),max=16,min=0;
+  ctx.clearRect(0,0,w,h);
+  ctx.beginPath();
+  pts.forEach((v,i)=>{const x=i*step,y=h-8-((v-min)/(max-min))*(h-16);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+  ctx.strokeStyle='#028090';ctx.lineWidth=2;ctx.stroke();
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
+  ctx.fillStyle='rgba(2,128,144,0.07)';ctx.fill();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+function init(){
+  const role=localStorage.getItem('ka_role')||'JUNIOR_RESIDENT';
+  const rls={INTERN:'Intern',JUNIOR_RESIDENT:'Jr. Resident',SENIOR_RESIDENT:'Sr. Resident',CONSULTANT:'Consultant',ADMIN:'Admin'};
+  document.getElementById('roleBadge').textContent=rls[role]||role;
+  const h=new Date().getHours();
+  document.getElementById('greeting').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+', Doctor.';
+  const aid=localStorage.getItem('ka_anonId')||('anon-'+Math.random().toString(36).slice(2,8).toUpperCase());
+  localStorage.setItem('ka_anonId',aid);
+  document.getElementById('anonIdDisplay').textContent=aid;
+  if(localStorage.getItem('ka_lastCheckin')!==new Date().toDateString())
+    document.getElementById('reminderBanner').style.display='flex';
+  if(localStorage.getItem('ka_womenMode')==='true') activateWomen();
+  const token=localStorage.getItem('ka_token');
+  fetch('/api/burnout/latest',{headers:{'Authorization':'Bearer '+token}})
+    .then(r=>r.json()).then(updateRadar)
+    .catch(()=>updateRadar({burnoutLevel:'MODERATE',score:9,trend:'STABLE',prediction:'WORSENING',trendValue:2}));
+  renderSupport('MODERATE');
+  drawMoodChart();
+}
+
+function toggleWomenMode(){
+  const next=localStorage.getItem('ka_womenMode')!=='true';
+  localStorage.setItem('ka_womenMode',next);
+  next?activateWomen():deactivateWomen();
+  const token=localStorage.getItem('ka_token');
+  fetch('/api/user/women-mode',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({enabled:next})}).catch(()=>{});
+}
+function activateWomen(){
+  document.getElementById('womenSafeBanner').style.display='flex';
+  document.getElementById('womenToggle').classList.add('on');
+  const wsl=document.getElementById('womenSideLink');
+  if(wsl) wsl.style.display='flex';
+}
+function deactivateWomen(){
+  document.getElementById('womenSafeBanner').style.display='none';
+  document.getElementById('womenToggle').classList.remove('on');
+  const wsl=document.getElementById('womenSideLink');
+  if(wsl) wsl.style.display='none';
+}
+function callICall(){window.location.href='tel:9152987821';}
+function logout(){localStorage.clear();window.location.href='index.html';}
+
+window.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
